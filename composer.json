@@ -71,6 +71,7 @@
         "pestphp/pest": "^4.7",
         "phpacker/phpacker": "^0.6.4",
         "phpoffice/phpspreadsheet": "^5.9",
-        "phpstan/phpstan": "^2.3"
+        "phpstan/phpstan": "^2.3",
+        "phpstan/phpstan-strict-rules": "^2.1"
     }
 }

@@ -1,0 +1,61 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$array \(non\-empty\-array\<int, ''api''\|''api\.destroy''\|''api\.index''\|''api\.show''\|''api\.store''\|''api\.update''\|''create''\|''destroy''\|''edit''\|''index''\|''show''\|''store''\|''update''\|''web''\>\) to function array_filter does not contain falsy values, the array will always stay the same\.$#'
+			identifier: arrayFilter.same
+			count: 1
+			path: src/Blueprint/Lexers/BlueprintFileLexer.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 2
+			path: src/Blueprint/Lexers/BlueprintFileLexer.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between array\{\}\|array\{delete\: ''\[singular\]'', redirect\: ''\[plural\]\.index''\}\|array\{delete\: ''\[singular\]'', respond\: 204\}\|array\{inertia\: ''\[model\]/Create''\}\|array\{inertia\: ''\[model\]/Edit with\:…''\}\|array\{inertia\: ''\[model\]/Show with\:…''\}\|array\{query\: ''all\:\[plural\]'', inertia\: ''\[model\]/Index with\:…''\}\|array\{query\: ''all\:\[plural\]'', resource\: ''collection\:\[plural\]''\}\|array\{resource\: ''\[singular\]''\}\|array\{validate\: ''\[columns\]'', save\: ''\[singular\]'', flash\: ''\[singular\]\.id'', redirect\: ''\[plural\]\.index''\}\|array\{validate\: ''\[columns\]'', save\: ''\[singular\]'', resource\: ''\[singular\]''\}\|array\{validate\: ''\[columns\]'', update\: ''\[singular\]'', flash\: ''\[singular\]\.id'', redirect\: ''\[plural\]\.index''\}\|array\{validate\: ''\[columns\]'', update\: ''\[singular\]'', resource\: ''\[singular\]''\}\|\(literal\-string&non\-falsy\-string\) and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: src/Blueprint/Lexers/BlueprintFileLexer.php
+
+		-
+			message: '#^The @implements tag of class ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Models\\BlueprintColumnCollection describes IteratorAggregate but the class implements\: ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Interfaces\\BlueprintColumnCollectionInterface$#'
+			identifier: generics.wrongParent
+			count: 1
+			path: src/Blueprint/Models/BlueprintColumnCollection.php
+
+		-
+			message: '#^Call to function is_object\(\) with null will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Blueprint/Models/BlueprintConfig.php
+
+		-
+			message: '#^If condition is always false\.$#'
+			identifier: if.alwaysFalse
+			count: 1
+			path: src/Blueprint/Parsers/HttpParser.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Console.php
+
+		-
+			message: '#^Parameter \#2 \$columns of class ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Models\\BlueprintModel constructor expects ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Models\\BlueprintColumnCollection, ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Interfaces\\BlueprintColumnCollectionInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console.php
+
+		-
+			message: '#^Variable \$parser in PHPDoc tag @var does not exist\.$#'
+			identifier: varTag.variableNotFound
+			count: 1
+			path: src/Console.php
+
+		-
+			message: '#^The @implements tag of class ZachWatkins\\InferLaravelBlueprint\\SQL\\Models\\SQLColumnCollection describes IteratorAggregate but the class implements\: ZachWatkins\\InferLaravelBlueprint\\SQL\\Interfaces\\SQLColumnCollectionInterface$#'
+			identifier: generics.wrongParent
+			count: 1
+			path: src/SQL/Models/SQLColumnCollection.php

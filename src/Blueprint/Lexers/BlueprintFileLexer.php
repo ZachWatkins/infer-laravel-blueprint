@@ -71,13 +71,18 @@ class BlueprintFileLexer
         foreach ($config->getModels() as $model) {
             $tree['models'][$model->name] = [];
             foreach ($model->columns as $column) {
-                $values = [$column->getType()->value];
-                if ($column->hasAttributes()) {
-                    $values[0] .= ':'.implode(',', $column->getAttributes());
-                }
-                if ($column->hasModifiers()) {
-                    foreach ($column->getModifiers() as $modifier) {
-                        $values[] = $modifier->value;
+                // Laravel Shift Blueprint is intentionally designed to only properly resolve model primary keys using the id column.
+                if ($column->getName() === 'id') {
+                    $values = ['id'];
+                } else {
+                    $values = [$column->getType()->value];
+                    if ($column->hasAttributes()) {
+                        $values[0] .= ':'.implode(',', $column->getAttributes());
+                    }
+                    if ($column->hasModifiers()) {
+                        foreach ($column->getModifiers() as $modifier) {
+                            $values[] = $modifier->value;
+                        }
                     }
                 }
                 $tree['models'][$model->name][$column->getName()] = implode(' ', $values);

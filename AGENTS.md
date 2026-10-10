@@ -93,6 +93,7 @@ Each test should validate real inference results from actual data, not mock-only
 - Install dependencies: `composer install`
 - Run the test suite: `composer run test`
 - Check code style: `composer run lint`
+- For every new or modified PHP file, run PHPStan on that file individually: `./vendor/bin/phpstan analyse <path-to-file.php>` (for example, `./vendor/bin/phpstan analyse src/Console.php`).
 - Build the packaged CLI: `composer run build`
 
 ## Coding-agent guidance

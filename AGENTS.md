@@ -93,7 +93,7 @@ Each test should validate real inference results from actual data, not mock-only
 - Install dependencies: `composer install`
 - Run the test suite: `composer run test`
 - Check code style: `composer run lint`
-- For every new or modified PHP file, run PHPStan on that file individually with concise output: `composer exec -- phpstan analyse <path-to-file.php> --no-progress --error-format=table` (for example, `composer exec -- phpstan analyse src/Console.php --no-progress --error-format=table`).
+- For every new or modified PHP file, run PHPStan on that file individually with concise output: `composer exec -- phpstan analyse <path-to-file.php> --no-progress --error-format=json` (for example, `composer exec -- phpstan analyse src/Console.php --no-progress --error-format=json`).
 - When fixing PHPStan issues in a specific file, start with that file's analysis rather than the full `composer analyse` run; use each diagnostic's file, line, and identifier to guide a type-safe fix, then rerun the same focused analysis. Run broader analysis only when the fix affects shared behavior or targeted results indicate it is needed.
 - Build the packaged CLI: `composer run build`
 

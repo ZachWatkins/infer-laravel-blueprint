@@ -25,12 +25,6 @@ parameters:
 			path: src/Blueprint/Models/BlueprintColumnCollection.php
 
 		-
-			message: '#^Call to function is_object\(\) with null will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: src/Blueprint/Models/BlueprintConfig.php
-
-		-
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
 			count: 1

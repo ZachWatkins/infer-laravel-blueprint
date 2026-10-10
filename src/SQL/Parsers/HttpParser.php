@@ -80,11 +80,11 @@ final class HttpParser implements ParserInterface
 
     /**
      * @param  array<mixed>  $body
-     * @return list<array<string, mixed>>|null
+     * @return list<mixed>|null
      */
     private function extractRecords(array $body): ?array
     {
-        if ($this->isRecordList($body)) {
+        if (\array_is_list($body)) {
             return $body;
         }
 
@@ -96,34 +96,35 @@ final class HttpParser implements ParserInterface
             }
         }
 
-        if (\count($arrayValues) !== 1 || ! $this->isRecordList($arrayValues[0])) {
+        if (\count($arrayValues) !== 1) {
             return null;
         }
 
-        return $arrayValues[0];
+        $records = $arrayValues[0];
+
+        if (! \array_is_list($records)) {
+            return null;
+        }
+
+        return $records;
     }
 
     /**
-     * @param  array<mixed>  $value
+     * @phpstan-assert-if-true array<string, mixed> $value
      */
-    private function isRecordList(array $value): bool
+    private function isRecord(mixed $value): bool
     {
-        if (! \array_is_list($value)) {
+        if (! \is_array($value) || \array_is_list($value)) {
             return false;
         }
 
-        foreach ($value as $record) {
-            if (! $this->isRecord($record)) {
+        foreach ($value as $key => $_) {
+            if (! \is_string($key)) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    private function isRecord(mixed $value): bool
-    {
-        return \is_array($value) && ! \array_is_list($value);
     }
 
     /**

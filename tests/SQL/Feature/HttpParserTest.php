@@ -97,6 +97,46 @@ it('parses a wrapped json array response', function () {
     }
 })->group('sql');
 
+it('returns valid records from a partially valid top-level list', function () {
+    $client = new class implements ClientInterface
+    {
+        public function sendRequest(RequestInterface $request): ResponseInterface
+        {
+            return new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                '[{"id":1},42,[{"id":99}],{"id":2}]'
+            );
+        }
+    };
+
+    $columns = (new HttpParser($client))->parse('https://example.com/users', 'mysql')->getColumns();
+
+    expect($columns)->toHaveCount(1);
+    expect($columns[0]->getName())->toBe('id');
+    expect($columns[0]->hasModifier(ColumnModifier::AutoIncrement))->toBeTrue();
+})->group('sql');
+
+it('returns valid records from a partially valid wrapped list', function () {
+    $client = new class implements ClientInterface
+    {
+        public function sendRequest(RequestInterface $request): ResponseInterface
+        {
+            return new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                '{"data":[{"id":1},42,{"id":2}]}'
+            );
+        }
+    };
+
+    $columns = (new HttpParser($client))->parse('https://example.com/users', 'mysql')->getColumns();
+
+    expect($columns)->toHaveCount(1);
+    expect($columns[0]->getName())->toBe('id');
+    expect($columns[0]->hasModifier(ColumnModifier::AutoIncrement))->toBeTrue();
+})->group('sql');
+
 it('rejects URL userinfo before sending an HTTP request', function () {
     $client = new class implements ClientInterface
     {

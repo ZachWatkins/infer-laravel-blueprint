@@ -29,7 +29,7 @@ Given the following example CSV file:
 %s
 ```
 
-Running `php index.php --blueprint-model=User path/to/users.csv` will produce the following result:
+Running `php index.php --model=User path/to/users.csv` will produce the following result:
 
 ```yaml
 %s
@@ -38,7 +38,7 @@ Running `php index.php --blueprint-model=User path/to/users.csv` will produce th
 Blueprint YAML is printed to the console by default. Add `--save` to write it to `user-blueprint.yaml` instead:
 
 ```sh
-php index.php --blueprint-model=User --save path/to/users.csv
+php index.php --model=User --save path/to/users.csv
 ```
 
 To use this file with Laravel Shift Blueprint in an existing Laravel application to scaffold the relevant framework files, run:
@@ -50,7 +50,7 @@ php artisan blueprint:build user-blueprint.yaml
 The CLI supports CSV, JSON, XML, and Excel files (`.xlsx`, `.xls`, and `.ods`). With `--format=blueprint`, it also accepts an HTTP or HTTPS URL. The URL path extension selects the matching parser and default `Accept` header (`text/csv`, `application/json`, `application/xml`, or the matching spreadsheet media type); query strings do not affect format detection. URLs without an extension default to JSON. HTTP sources use a single GET request. Add or override request headers with repeatable `--http-header=<name>:<value>` options (note: the CLI rejects attempts to use credential headers for security purposes). Set `--http-timeout=<seconds>` to control the timeout for each HTTP request; it defaults to 30 seconds and accepts 1-3600 seconds. Before downloading, the CLI sends a HEAD request and rejects responses whose declared length exceeds one quarter of remaining PHP memory, capped at 64 MiB. The same ceiling is enforced on the download:
 
 ```sh
-php index.php --blueprint-model=Post --http-header="User-Agent: MyApp" https://jsonplaceholder.typicode.com/posts
+php index.php --model=Post --http-header="User-Agent: MyApp" https://jsonplaceholder.typicode.com/posts
 ```
 
 Blueprint YAML is printed to the console by default. With `--save`, HTTP output is written to the current working directory, or the directory specified by `--cwd`.

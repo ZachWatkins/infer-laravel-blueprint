@@ -25,7 +25,7 @@ id,name,locale,birthdate,accept_terms
 9,"Rahul Sharma",en-IN,1995-09-09,false
 ```
 
-Running `php index.php --blueprint-model=User path/to/users.csv` will produce the following result:
+Running `php index.php --model=User path/to/users.csv` will produce the following result:
 
 ```yaml
 models:
@@ -68,7 +68,7 @@ seeders: User
 Blueprint YAML is printed to the console by default. Add `--save` to write it to `user-blueprint.yaml` instead:
 
 ```sh
-php index.php --blueprint-model=User --save path/to/users.csv
+php index.php --model=User --save path/to/users.csv
 ```
 
 To use this file with Laravel Shift Blueprint in an existing Laravel application to scaffold the relevant framework files, run:
@@ -80,7 +80,7 @@ php artisan blueprint:build user-blueprint.yaml
 The CLI supports CSV, JSON, XML, and Excel files (`.xlsx`, `.xls`, and `.ods`). With `--format=blueprint`, it also accepts an HTTP or HTTPS URL. The URL path extension selects the matching parser and default `Accept` header (`text/csv`, `application/json`, `application/xml`, or the matching spreadsheet media type); query strings do not affect format detection. URLs without an extension default to JSON. HTTP sources use a single GET request. Add or override request headers with repeatable `--http-header=<name>:<value>` options (note: the CLI rejects attempts to use credential headers for security purposes). Set `--http-timeout=<seconds>` to control the timeout for each HTTP request; it defaults to 30 seconds and accepts 1-3600 seconds. Before downloading, the CLI sends a HEAD request and rejects responses whose declared length exceeds one quarter of remaining PHP memory, capped at 64 MiB. The same ceiling is enforced on the download:
 
 ```sh
-php index.php --blueprint-model=Post --http-header="User-Agent: MyApp" https://jsonplaceholder.typicode.com/posts
+php index.php --model=Post --http-header="User-Agent: MyApp" https://jsonplaceholder.typicode.com/posts
 ```
 
 Blueprint YAML is printed to the console by default. With `--save`, HTTP output is written to the current working directory, or the directory specified by `--cwd`.
@@ -90,30 +90,25 @@ To see all available options, run `php index.php --help`:
 ```sh
 $ php index.php --help
 Infer a Laravel Shift Blueprint file from various data sources. By Zach Watkins.
-Usage: index.php [--blueprint-controller-methods=index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy,<custom>] [--blueprint-model=<name>] [--blueprint-resource=web,api,index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy] [--blueprint-seeders]  [--blueprint-view=blade|inertia] [--cwd=<current-working-directory>] [--data-selector=<selector>] [--db=mysql|sqlite|sqlserver] [--dry-run] [--format=blueprint,sql] [--http-header=<name>:<value>] [--http-timeout=<seconds>] [--save] [--help] <path-or-url>
+Usage: index.php [--controller-methods=index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy,<custom>] [--model=<name>] [--resource=web,api,index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy] [--seeders]  [--view=blade|inertia] [--cwd=<current-working-directory>] [--data-selector=<selector>] [--dry-run] [--http-header=<name>:<value>] [--http-timeout=<seconds>] [--save] [--help] <path-or-url>
 
 Options:
-  [--blueprint-controller-methods=]
-                          Specify the Blueprint controller methods.
+  [--controller-methods=] Specify the Blueprint controller methods.
                           Accepts: index, create, store, edit, update, show,
                           destroy, api.index, api.store, api.store, api.update,
                           api.show, api.destroy, <custom>. Default: none.
-  [--blueprint-model=]    Specify the Blueprint model name.
-  [--blueprint-resource=] Define the Blueprint model controller resources.
+  [--model=]              Specify the Blueprint model name.
+  [--resource=]           Define the Blueprint model controller resources.
                           Accepts: web, api, index, create, store, edit, update,
                           show, destroy, api.index, api.store, api.store,
                           api.update, api.show, api.destroy. Default: none.
-  [--blueprint-seeders]   Include seeders in Blueprint output.
-  [--blueprint-view=]     Set the Blueprint view type. Accepts: blade, inertia.
+  [--seeders]             Include seeders in Blueprint output.
+  [--view=]               Set the Blueprint view type. Accepts: blade, inertia.
                           Default: blade.
   [--cwd=]                Set the current working directory.
   [--data-selector=]      Specify a data selector (e.g., JSONPath, XPath) for
                           extracting relevant data from the source.
-  [--db=]                 Database type. Accepts: sqlite, mysql, sqlserver.
-                          Default: mysql.
   [--dry-run]             Perform a trial run without making any changes.
-  [--format=]             Output format. Accepts: sql, blueprint.
-                          Default: blueprint.
   [--http-header=]        Add a request header for an HTTP Blueprint source.
                           May be specified more than once. Rejects credential
                           headers: Authorization, Proxy-Authorization, Cookie.

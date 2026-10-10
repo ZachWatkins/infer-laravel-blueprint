@@ -14,7 +14,7 @@ description: "Use when: generating a Laravel Shift Blueprint YAML file from a da
 
 # Laravel Shift Blueprint Generator
 
-ONLY EXECUTE the `infer-laravel-blueprint` CLI tool located at `./infer-laravel-blueprint`. DO NOT use python, composer, or any other CLI tool as a feature of this skill.
+ONLY EXECUTE the `infer-laravel-blueprint` CLI tool located at `./infer-laravel-blueprint`. Additionally, you may run `composer require laravel-shift/blueprint` if the user wants to install the required dependency for their Laravel project when using the blueprint that `infer-laravel-blueprint` creates. DO NOT use python, composer, or any other CLI tool as a feature of this skill.
 ONLY READ files created by the `infer-laravel-blueprint` CLI tool.
 DO NOT WRITE OR MODIFY any files yourself when using this skill.
 DO NOT search for files unless they are parameters for the `infer-laravel-blueprint` CLI tool.
@@ -85,6 +85,12 @@ If the user does not provide a value for an option, ask a short follow-up questi
    - If the user wants to preview the file and not save it, then run the command without the `--save` flag to capture the results from stdout and provide this to the user.
    - If the generation succeeds, summarize where the YAML was written or what was previewed.
 
+5. If the user wants to build Laravel framework files using the generated Blueprint file:
+   - Confirm their workspace directory includes a `artisan` file.
+   - Confirm their workspace directory includes a `composer.json` file.
+   - Confirm their workspace's `composer.json` file includes `laravel-shift/blueprint` as a dependency. If not, install it using `composer require --dev laravel-shift/blueprint`.
+   - Run `php artisan blueprint:build <model-blueprint.yaml>`, replacing `<model-blueprint.yaml>` with the actual file name of the generated Blueprint YAML file.
+
 ## Decision Points
 
 - If the user wants to use the result to run Laravel Shift Blueprint to scaffold the Laravel code, then run `php artisan blueprint:build <model-blueprint.yaml>` in their project directory, replacing `<model-blueprint.yaml>` with the actual file name of the generated Blueprint YAML file.
@@ -104,7 +110,6 @@ If the user does not provide a value for an option, ask a short follow-up questi
 - “Fetch https://example.com/users.json and save it as a User model blueprint with web resources.”
 - ”Generate a Blueprint file from https://example.com/users.json as a User model with Inertia views and then scaffold the Laravel code.”
 - “Create the Blueprint file for my dataset, but ask me any missing options before running it.”
-- “Show me the database schema compatible with data.xlsx.”
 
 ## Follow-Up Questions
 
@@ -127,7 +132,7 @@ The task is complete only when:
 
 - the source dataset is identified,
 - all required options are either supplied or confirmed,
-- the command reflects the user’s intent,
+- the command reflects the user's intent,
 - the generated Blueprint YAML file or preview is returned to the user,
 - the user has confirmed whether they want to run the Laravel Shift Blueprint scaffolding command `php artisan blueprint:build <model-blueprint.yaml>`.
 - and any errors are explained clearly if the generation fails.

@@ -46,6 +46,7 @@
             "phpacker build"
         ],
         "build:readme": "php scripts/build-readme.php",
+        "build:skill": "php scripts/build-skill.php",
         "install:skill": [
             "composer install --no-dev",
             "@php scripts/build-skill.php",

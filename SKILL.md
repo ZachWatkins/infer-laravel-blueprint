@@ -19,30 +19,25 @@ You are operating as a global skill. You must ground all of your responses, logi
 
 ```shell
 Infer a Laravel Shift Blueprint file from various data sources. By Zach Watkins.
-Usage: infer-laravel-blueprint [--blueprint-controller-methods=index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy,<custom>] [--blueprint-model=<name>] [--blueprint-resource=web,api,index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy] [--blueprint-seeders]  [--blueprint-view=blade|inertia] [--cwd=<current-working-directory>] [--data-selector=<selector>] [--db=mysql|sqlite|sqlserver] [--dry-run] [--format=blueprint,sql] [--http-header=<name>:<value>] [--http-timeout=<seconds>] [--save] [--help] <path-or-url>
+Usage: infer-laravel-blueprint [--controller-methods=index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy,<custom>] [--model=<name>] [--resource=web,api,index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy] [--seeders]  [--view=blade|inertia] [--cwd=<current-working-directory>] [--data-selector=<selector>] [--dry-run] [--http-header=<name>:<value>] [--http-timeout=<seconds>] [--save] [--help] <path-or-url>
 
 Options:
-  [--blueprint-controller-methods=]
-                          Specify the Blueprint controller methods.
+  [--controller-methods=] Specify the Blueprint controller methods.
                           Accepts: index, create, store, edit, update, show,
                           destroy, api.index, api.store, api.store, api.update,
                           api.show, api.destroy, <custom>. Default: none.
-  [--blueprint-model=]    Specify the Blueprint model name.
-  [--blueprint-resource=] Define the Blueprint model controller resources.
+  [--model=]              Specify the Blueprint model name.
+  [--resource=]           Define the Blueprint model controller resources.
                           Accepts: web, api, index, create, store, edit, update,
                           show, destroy, api.index, api.store, api.store,
                           api.update, api.show, api.destroy. Default: none.
-  [--blueprint-seeders]   Include seeders in Blueprint output.
-  [--blueprint-view=]     Set the Blueprint view type. Accepts: blade, inertia.
+  [--seeders]             Include seeders in Blueprint output.
+  [--view=]               Set the Blueprint view type. Accepts: blade, inertia.
                           Default: blade.
   [--cwd=]                Set the current working directory.
   [--data-selector=]      Specify a data selector (e.g., JSONPath, XPath) for
                           extracting relevant data from the source.
-  [--db=]                 Database type. Accepts: sqlite, mysql, sqlserver.
-                          Default: mysql.
   [--dry-run]             Perform a trial run without making any changes.
-  [--format=]             Output format. Accepts: sql, blueprint.
-                          Default: blueprint.
   [--http-header=]        Add a request header for an HTTP Blueprint source.
                           May be specified more than once. Rejects credential
                           headers: Authorization, Proxy-Authorization, Cookie.

@@ -15,40 +15,31 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser as BlueprintHttpParser;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpResponseSizeLimitException;
-use ZachWatkins\InferLaravelBlueprint\SQL\Enums\ColumnModifier;
-use ZachWatkins\InferLaravelBlueprint\SQL\Enums\DatabaseType;
 use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\ParserInterface as SQLParserInterface;
-use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\SQLColumnCollectionInterface;
-use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\SQLColumnInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
 
 final class Console
 {
     private const HELP = 'Infer a Laravel Shift Blueprint file from various data sources. By Zach Watkins.
-Usage: {filename} [--blueprint-controller-methods=index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy,<custom>] [--blueprint-model=<name>] [--blueprint-resource=web,api,index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy] [--blueprint-seeders]  [--blueprint-view=blade|inertia] [--cwd=<current-working-directory>] [--data-selector=<selector>] [--db=mysql|sqlite|sqlserver] [--dry-run] [--format=blueprint,sql] [--http-header=<name>:<value>] [--http-timeout=<seconds>] [--save] [--help] <path-or-url>
+Usage: {filename} [--controller-methods=index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy,<custom>] [--model=<name>] [--resource=web,api,index,create,store,edit,update,show,destroy,api.index,api.store,api.store,api.update,api.show,api.destroy] [--seeders]  [--view=blade|inertia] [--cwd=<current-working-directory>] [--data-selector=<selector>] [--dry-run] [--http-header=<name>:<value>] [--http-timeout=<seconds>] [--save] [--help] <path-or-url>
 
 Options:
-  [--blueprint-controller-methods=]
-                          Specify the Blueprint controller methods.
+  [--controller-methods=] Specify the Blueprint controller methods.
                           Accepts: index, create, store, edit, update, show,
                           destroy, api.index, api.store, api.store, api.update,
                           api.show, api.destroy, <custom>. Default: none.
-  [--blueprint-model=]    Specify the Blueprint model name.
-  [--blueprint-resource=] Define the Blueprint model controller resources.
+  [--model=]              Specify the Blueprint model name.
+  [--resource=]           Define the Blueprint model controller resources.
                           Accepts: web, api, index, create, store, edit, update,
                           show, destroy, api.index, api.store, api.store,
                           api.update, api.show, api.destroy. Default: none.
-  [--blueprint-seeders]   Include seeders in Blueprint output.
-  [--blueprint-view=]     Set the Blueprint view type. Accepts: blade, inertia.
+  [--seeders]             Include seeders in Blueprint output.
+  [--view=]               Set the Blueprint view type. Accepts: blade, inertia.
                           Default: blade.
   [--cwd=]                Set the current working directory.
   [--data-selector=]      Specify a data selector (e.g., JSONPath, XPath) for
                           extracting relevant data from the source.
-  [--db=]                 Database type. Accepts: sqlite, mysql, sqlserver.
-                          Default: mysql.
   [--dry-run]             Perform a trial run without making any changes.
-  [--format=]             Output format. Accepts: sql, blueprint.
-                          Default: blueprint.
   [--http-header=]        Add a request header for an HTTP Blueprint source.
                           May be specified more than once. Rejects credential
                           headers: Authorization, Proxy-Authorization, Cookie.
@@ -102,22 +93,12 @@ Options:
         $this->stderr = $stderr ?? \STDERR;
         $this->httpClient = $httpClient;
         $this->parserClasses = $parserClasses ?? [
-            'sql' => [
-                'csv' => '\ZachWatkins\InferLaravelBlueprint\SQL\Parsers\CsvParser',
-                'json' => '\ZachWatkins\InferLaravelBlueprint\SQL\Parsers\JsonParser',
-                'xml' => '\ZachWatkins\InferLaravelBlueprint\SQL\Parsers\XmlParser',
-                'xlsx' => '\ZachWatkins\InferLaravelBlueprint\SQL\Parsers\ExcelParser',
-                'xls' => '\ZachWatkins\InferLaravelBlueprint\SQL\Parsers\ExcelParser',
-                'ods' => '\ZachWatkins\InferLaravelBlueprint\SQL\Parsers\ExcelParser',
-            ],
-            'blueprint' => [
-                'csv' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\CsvParser',
-                'json' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\JsonParser',
-                'xml' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\XmlParser',
-                'xlsx' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
-                'xls' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
-                'ods' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
-            ],
+            'csv' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\CsvParser',
+            'json' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\JsonParser',
+            'xml' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\XmlParser',
+            'xlsx' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
+            'xls' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
+            'ods' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
         ];
 
         $runningPhar = \Phar::running(false);
@@ -136,10 +117,8 @@ Options:
     public function run(array $argv): int
     {
         $source = null;
-        $databaseType = DatabaseType::MySQL;
         $currentWorkingDirectory = null;
         $dryRun = false;
-        $format = 'blueprint';
         $blueprintOptions = [
             'model' => null,
             'seeders' => false,
@@ -159,42 +138,14 @@ Options:
                 return 0;
             }
 
-            if (\str_starts_with($argument, '--db=')) {
-                $requestedDatabaseType = DatabaseType::tryFrom(\strtolower(\substr($argument, 5)));
-
-                if ($requestedDatabaseType === null) {
-                    $this->writeUsage('Error: Invalid database type specified: '.\substr($argument, 5));
-
-                    return 1;
-                }
-
-                $databaseType = $requestedDatabaseType;
-
-                continue;
-            }
-
             if (\str_starts_with($argument, '--cwd=')) {
                 $currentWorkingDirectory = \substr($argument, 6);
 
                 continue;
             }
 
-            if (\str_starts_with($argument, '--format=')) {
-                $requestedFormat = \strtolower(\substr($argument, 9));
-
-                if (! \in_array($requestedFormat, ['sql', 'blueprint'], true)) {
-                    $this->writeUsage('Error: Invalid format specified: '.$requestedFormat);
-
-                    return 1;
-                }
-
-                $format = $requestedFormat;
-
-                continue;
-            }
-
-            if (\str_starts_with($argument, '--blueprint-model=')) {
-                $blueprintOptions['model'] = \substr($argument, 18);
+            if (\str_starts_with($argument, '--model=')) {
+                $blueprintOptions['model'] = \substr($argument, 8);
 
                 continue;
             }
@@ -234,7 +185,7 @@ Options:
 
                 continue;
             }
-            if (\str_starts_with($argument, '--blueprint-seeders')) {
+            if (\str_starts_with($argument, '--seeders')) {
                 $blueprintOptions['seeders'] = true;
 
                 continue;
@@ -246,20 +197,20 @@ Options:
                 continue;
             }
 
-            if (\str_starts_with($argument, '--blueprint-view=')) {
-                $blueprintOptions['view'] = \substr($argument, 17);
+            if (\str_starts_with($argument, '--view=')) {
+                $blueprintOptions['view'] = \substr($argument, 7);
 
                 continue;
             }
 
-            if (\str_starts_with($argument, '--blueprint-controller-methods=')) {
-                $blueprintOptions['methods'] = \array_map('trim', \explode(',', \substr($argument, 25)));
+            if (\str_starts_with($argument, '--controller-methods=')) {
+                $blueprintOptions['methods'] = \array_map('trim', \explode(',', \substr($argument, 21)));
 
                 continue;
             }
 
-            if (\str_starts_with($argument, '--blueprint-resource=')) {
-                $resourceType = \substr($argument, 27);
+            if (\str_starts_with($argument, '--resource=')) {
+                $resourceType = \substr($argument, 11);
                 $split = \array_map('trim', \explode(',', $resourceType));
                 foreach ($split as $resource) {
                     $resolved = BlueprintConfigResource::tryFrom($resource);
@@ -302,14 +253,6 @@ Options:
 
                 return 1;
             }
-
-            if ($format !== 'blueprint') {
-                $this->writeError(
-                    'HTTP sources are supported only with --format=blueprint.'
-                );
-
-                return 1;
-            }
         } else {
             if (! \str_starts_with($source, '/') && ! \preg_match('/^[a-zA-Z]:\\\\/', $source)) {
                 if (! file_exists($source)) {
@@ -339,7 +282,7 @@ Options:
             }
         }
 
-        $parserClass = $this->resolveParserClass($format, $source);
+        $parserClass = $this->resolveParserClass($source);
 
         if ($parserClass === null) {
             $this->writeUsage('Error: Unable to resolve parser class for the specified format and source.');
@@ -353,17 +296,9 @@ Options:
             return 1;
         }
 
-        if (\is_a($parserClass, SQLParserInterface::class, true)) {
-            /** @var SQLParserInterface $parser */
-            $parser = new $parserClass;
-            $columns = $parser->parse($source, $databaseType->value);
-
-            if (! $dryRun) {
-                $this->writeSQLColumns($columns);
-            }
-        } elseif (\is_a($parserClass, BlueprintParserInterface::class, true)) {
+        if (\is_a($parserClass, BlueprintParserInterface::class, true)) {
             if (! is_string($blueprintOptions['model']) || empty($blueprintOptions['model'])) {
-                $this->writeError('Error: The --blueprint-model option must be provided and must be a non-empty string.');
+                $this->writeError('Error: The --model option must be provided and must be a non-empty string.');
 
                 return 1;
             }
@@ -519,7 +454,7 @@ Options:
         return \min(self::MAX_HTTP_RESPONSE_BYTES, \max(1, \intdiv($availableMemoryBytes, 4)));
     }
 
-    private function resolveParserClass(string $format, string $source): ?string
+    private function resolveParserClass(string $source): ?string
     {
         $extension = $this->sourceExtension($source) ?? ($this->isHttpSource($source) ? 'json' : null);
 
@@ -527,7 +462,7 @@ Options:
             return null;
         }
 
-        return $this->parserClasses[$format][$extension] ?? null;
+        return $this->parserClasses[$extension] ?? null;
     }
 
     private function writeUsage(string $message = ''): void
@@ -540,30 +475,6 @@ Options:
             $this->stderr,
             $output
         );
-    }
-
-    private function writeSQLColumns(SQLColumnCollectionInterface $columns): void
-    {
-        foreach ($columns->getColumns() as $column) {
-            $this->writeToStream($this->stdout, $this->formatSQLColumn($column)."\n");
-        }
-    }
-
-    private function formatSQLColumn(SQLColumnInterface $column): string
-    {
-        $modifiers = \implode(
-            ' ',
-            \array_map(
-                static fn (ColumnModifier $modifier): string => $modifier->value,
-                $column->getModifiers(),
-            )
-        );
-
-        if ($modifiers === '') {
-            return \sprintf('%s: %s', $column->getName(), $column->getType());
-        }
-
-        return \sprintf('%s: %s %s', $column->getName(), $column->getType(), $modifiers);
     }
 
     private function writeError(string $message): void

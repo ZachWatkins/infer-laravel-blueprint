@@ -66,7 +66,7 @@ it('outputs blueprint YAML file contents to the console if --save is not provide
     $dataFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/test_mysql.csv');
     $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/test_mysql_basic.yaml');
 
-    $result = $runConsole(['infer-laravel-blueprint', '--format=blueprint', '--blueprint-model=Model', $dataFixturePath]);
+    $result = $runConsole(['infer-laravel-blueprint', '--model=Model', $dataFixturePath]);
 
     $expectedOutput = file_get_contents($blueprintFixturePath);
 
@@ -99,8 +99,7 @@ it('outputs blueprint YAML from an HTTP source using an injected client', functi
 
     $result = $runConsole([
         'infer-laravel-blueprint',
-        '--format=blueprint',
-        '--blueprint-model=Model',
+        '--model=Model',
         '--http-header=Accept: application/vnd.example+json',
         '--http-timeout=5',
         'https://example.com/users',
@@ -117,7 +116,7 @@ it('outputs blueprint YAML from an HTTP source using an injected client', functi
     $expectedSavePath = realpath($outputDirectory).DIRECTORY_SEPARATOR.'model-blueprint.yaml';
     $saveResult = $runConsole([
         'infer-laravel-blueprint',
-        '--blueprint-model=Model',
+        '--model=Model',
         '--cwd='.$outputDirectory,
         '--save',
         'https://example.com/users',
@@ -132,7 +131,7 @@ it('rejects credential HTTP headers', function () use ($runConsole) {
     foreach (['Authorization', 'Proxy-Authorization', 'Cookie'] as $headerName) {
         $result = $runConsole([
             'infer-laravel-blueprint',
-            '--blueprint-model=Model',
+            '--model=Model',
             '--http-header='.$headerName.': secret',
             'https://example.com/users',
         ]);
@@ -159,7 +158,7 @@ it('rejects URL userinfo before sending an HTTP request', function () use ($runC
     $source = 'https://user:secret@example.com/users.json';
     $result = $runConsole([
         'infer-laravel-blueprint',
-        '--blueprint-model=Model',
+        '--model=Model',
         $source,
     ], httpClient: $client);
 
@@ -191,7 +190,7 @@ it('rejects an oversized response from HEAD without requesting its body', functi
 
     $result = $runConsole([
         'infer-laravel-blueprint',
-        '--blueprint-model=Model',
+        '--model=Model',
         'https://example.com/large.json',
     ], httpClient: $client);
 
@@ -255,7 +254,7 @@ it('stops reading an unknown-length response as soon as the limit is exceeded', 
 it('rejects an invalid HTTP timeout', function () use ($runConsole) {
     $result = $runConsole([
         'infer-laravel-blueprint',
-        '--blueprint-model=Model',
+        '--model=Model',
         '--http-timeout=0',
         'https://example.com/users.json',
     ]);
@@ -308,7 +307,7 @@ it('selects a matching parser and Accept header for an HTTP file URL', function 
 
         $result = $runConsole([
             'infer-laravel-blueprint',
-            '--blueprint-model=Model',
+            '--model=Model',
             'https://example.com/users.'.$extension.'?download=1',
         ], httpClient: $client);
 
@@ -323,7 +322,7 @@ it('saves a blueprint YAML file to disk in same folder as data source if --save 
     $dataFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/test_mysql.csv');
     $expectedSavePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/model-blueprint.yaml');
     $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/test_mysql_basic.yaml');
-    $result = $runConsole(['infer-laravel-blueprint', '--format=blueprint', '--blueprint-model=Model', '--save', $dataFixturePath]);
+    $result = $runConsole(['infer-laravel-blueprint', '--model=Model', '--save', $dataFixturePath]);
     expect(file_exists(realpath($expectedSavePath)))->toBeTrue();
     expect($result['exitCode'])->toBe(0)
         ->and($result['stdout'])->toContain('Blueprint file saved to '.realpath($expectedSavePath))

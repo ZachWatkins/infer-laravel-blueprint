@@ -48,6 +48,9 @@ enum BlueprintConfigResource: string
         ], true);
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function webMethods(): array
     {
         return [
@@ -61,6 +64,9 @@ enum BlueprintConfigResource: string
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function apiMethods(): array
     {
         return [

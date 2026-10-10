@@ -24,7 +24,7 @@ class BlueprintFileLexer
                 }
             }
         }
-        if (isset($tree['controllers']) && $tree['controllers']) {
+        if ($tree['controllers']) {
             if ($tree['models']) {
                 $output .= "\n";
             }
@@ -44,7 +44,7 @@ class BlueprintFileLexer
             }
         }
         if ($tree['seeders']) {
-            if (isset($tree['controllers']) && $tree['controllers']) {
+            if ($tree['controllers']) {
                 $output .= "\n";
             }
             $output .= 'seeders: '.\implode(', ', $tree['seeders']);
@@ -54,6 +54,13 @@ class BlueprintFileLexer
         return $output;
     }
 
+    /**
+     * @return array{
+     *     models: array<string, array<string, string>>,
+     *     controllers: array<string, array<string, array<string, mixed>|string>>,
+     *     seeders: list<string>
+     * }
+     */
     public function toTree(BlueprintConfig $config): array
     {
         $tree = [
@@ -89,6 +96,9 @@ class BlueprintFileLexer
         return $tree;
     }
 
+    /**
+     * @return array<string, array<string, mixed>|string>
+     */
     private function getControllerTree(BlueprintModel $model, BlueprintConfig $config): array
     {
         if ($config->view === BlueprintConfigView::Inertia) {
@@ -172,6 +182,9 @@ class BlueprintFileLexer
         return $result;
     }
 
+    /**
+     * @return array<string, array<string, mixed>|string>
+     */
     private function getInertiaControllerTree(BlueprintModel $model, BlueprintConfig $config): array
     {
         $template = [
@@ -288,6 +301,10 @@ class BlueprintFileLexer
         return $result;
     }
 
+    /**
+     * @param  array<string, array<string, mixed>|string|null>  $tree
+     * @return array<string, array<string, mixed>|string|null>
+     */
     private function resolveModelControllerPlaceholders(array $tree, BlueprintModel $model): array
     {
         foreach ($tree as $method => $actions) {
@@ -334,6 +351,10 @@ class BlueprintFileLexer
         return $parameters;
     }
 
+    /**
+     * @param  array<string, array<string, mixed>|string|null>  $tree
+     * @return array<string, array<string, mixed>|string|null>
+     */
     private function resolveConflictingControllerMethods(array $tree): array
     {
         foreach ($tree as $method => $actions) {

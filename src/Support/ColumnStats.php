@@ -98,6 +98,9 @@ final class ColumnStats
         $this->recordScalar($value);
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getSeenValues(): array
     {
         return array_keys($this->seenValues);

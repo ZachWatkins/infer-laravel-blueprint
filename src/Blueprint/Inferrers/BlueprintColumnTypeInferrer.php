@@ -82,6 +82,9 @@ final class BlueprintColumnTypeInferrer implements BlueprintColumnTypeInferrerIn
         };
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function resolveAttributes(ColumnStats $stats): array
     {
         $type = $this->resolveType($stats);

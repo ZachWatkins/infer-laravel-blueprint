@@ -38,6 +38,9 @@ class BlueprintModel
         };
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function columnNames(): array
     {
         $names = [];

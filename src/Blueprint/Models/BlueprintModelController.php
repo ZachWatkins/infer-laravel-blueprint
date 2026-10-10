@@ -8,8 +8,12 @@ class BlueprintModelController
 {
     private const METHODS = ['index', 'create', 'read', 'update', 'delete'];
 
+    /** @var array<string, mixed> */
     public readonly array $methods;
 
+    /**
+     * @param  array<int, string>  $methodsParam
+     */
     public function __construct(
         protected BlueprintModel $model,
         array $methodsParam,
@@ -26,6 +30,10 @@ class BlueprintModelController
         $this->methods = $this->assembleMethods($methodsParam);
     }
 
+    /**
+     * @param  array<int, string>  $methodsParam
+     * @return array<string, mixed>
+     */
     protected function assembleMethods(array $methodsParam): array
     {
         $tree = [];

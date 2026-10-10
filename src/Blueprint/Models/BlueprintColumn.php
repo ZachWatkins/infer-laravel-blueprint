@@ -14,6 +14,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnInterf
 final class BlueprintColumn implements BlueprintColumnInterface
 {
     /**
+     * @param  array<int, string>  $attributes
      * @param  array<int, ColumnModifier>  $modifiers
      */
     public function __construct(
@@ -33,6 +34,9 @@ final class BlueprintColumn implements BlueprintColumnInterface
         return $this->type;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getAttributes(): array
     {
         return $this->attributes;

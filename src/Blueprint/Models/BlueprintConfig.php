@@ -29,6 +29,11 @@ class BlueprintConfig
 
     public readonly BlueprintConfigView $view;
 
+    /**
+     * @param  array<int, mixed>  $models
+     * @param  array<int, mixed>  $resources
+     * @param  array<int, mixed>  $methods
+     */
     public function __construct(
         array $models = [],
         array $resources = [],
@@ -48,11 +53,18 @@ class BlueprintConfig
         $this->models[] = $model;
     }
 
+    /**
+     * @return array<int, BlueprintModel>
+     */
     public function getModels(): array
     {
         return $this->models;
     }
 
+    /**
+     * @param  array<int, mixed>  $models
+     * @return array<int, BlueprintModel>
+     */
     private function resolveModels(array $models): array
     {
         $resolved = [];
@@ -89,7 +101,7 @@ class BlueprintConfig
     }
 
     /**
-     * @param  array<int, string>  $methods
+     * @param  array<int, mixed>  $methods
      * @return array<int, string>
      */
     private function resolveMethods(array $methods): array
@@ -113,7 +125,7 @@ class BlueprintConfig
     /**
      * Resolves an array of resource strings, ensuring each item is a valid string.
      *
-     * @param  array<int, BlueprintConfigResource>  $resource
+     * @param  array<int, mixed>  $resource
      * @return array<int, BlueprintConfigResource>
      */
     private function resolveResources(array $resource): array

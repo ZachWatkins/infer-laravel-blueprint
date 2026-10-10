@@ -268,8 +268,8 @@ final class ColumnStats
             $precision = 0;
             $scale = 0;
             $parts = \explode('.', (string) $value);
-            $scale = isset($parts[1]) ? (int) \strlen($parts[1]) : 0;
-            $precision = (int) \strlen($parts[0]) + $scale;
+            $scale = isset($parts[1]) ? \strlen($parts[1]) : 0;
+            $precision = \strlen($parts[0]) + $scale;
             $this->precision = \max($this->precision, $precision);
             $this->scale = \max($this->scale, $scale);
         }
@@ -294,7 +294,7 @@ final class ColumnStats
         }
 
         if ($isInt) {
-            $this->updateSequence((int) $numericValue);
+            $this->updateSequence($numericValue);
         } else {
             $this->sequenceIntact = false;
         }
@@ -344,7 +344,7 @@ final class ColumnStats
 
         $trimmed = \trim($value);
 
-        if (! \preg_match('/^-?\d+$/', $trimmed)) {
+        if (\preg_match('/^-?\d+$/', $trimmed) !== 1) {
             return false;
         }
 
@@ -375,7 +375,7 @@ final class ColumnStats
 
     private static function isDateLike(bool|int|float|string $value): bool
     {
-        if (! \is_string($value) || ! \preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', \trim($value), $matches)) {
+        if (! \is_string($value) || \preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', \trim($value), $matches) !== 1) {
             return false;
         }
 
@@ -390,7 +390,7 @@ final class ColumnStats
 
         $pattern = '/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/';
 
-        if (! \preg_match($pattern, \trim($value), $matches)) {
+        if (\preg_match($pattern, \trim($value), $matches) !== 1) {
             return false;
         }
 
@@ -402,7 +402,7 @@ final class ColumnStats
 
     private static function isTimeLike(bool|int|float|string $value): bool
     {
-        if (! \is_string($value) || ! \preg_match('/^(\d{2}):(\d{2}):(\d{2})(\.\d+)?$/', \trim($value), $matches)) {
+        if (! \is_string($value) || \preg_match('/^(\d{2}):(\d{2}):(\d{2})(\.\d+)?$/', \trim($value), $matches) !== 1) {
             return false;
         }
 

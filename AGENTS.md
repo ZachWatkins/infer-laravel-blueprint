@@ -108,6 +108,8 @@ When making code changes, aim for:
 
 The real purpose of this repo is not to be a generic framework. It is a compact, data-source-driven schema generator that infers usable SQL or Laravel Blueprint definitions from sample records. That purpose should guide all implementation choices.
 
+When the user requests phpstan fixes to a specific file, run `./vendor/bin/phpstan analyse <path-to-file.php>` (for example, `./vendor/bin/phpstan analyse src/Console.php`).
+
 When making changes to `README.md`, instead make those changes to `scripts/build-readme.php` and run `composer build:readme`.
 
 When making changes to the signature of `src/Console.php`, also run `composer build:readme` and update any related tests to reflect the new interface.

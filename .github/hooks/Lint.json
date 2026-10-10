@@ -4,7 +4,11 @@
 			{
 				"type": "command",
 				"command": "./vendor/bin/pint"
-			}
+			},
+            {
+                "type": "command",
+                "command": "./vendor/bin/phpstan analyse"
+            }
 		]
 	}
 }

@@ -93,7 +93,8 @@ Each test should validate real inference results from actual data, not mock-only
 - Install dependencies: `composer install`
 - Run the test suite: `composer run test`
 - Check code style: `composer run lint`
-- For every new or modified PHP file, run PHPStan on that file individually: `./vendor/bin/phpstan analyse <path-to-file.php>` (for example, `./vendor/bin/phpstan analyse src/Console.php`).
+- For every new or modified PHP file, run PHPStan on that file individually with concise output: `composer exec -- phpstan analyse <path-to-file.php> --no-progress --error-format=table` (for example, `composer exec -- phpstan analyse src/Console.php --no-progress --error-format=table`).
+- When fixing PHPStan issues in a specific file, start with that file's analysis rather than the full `composer analyse` run; use each diagnostic's file, line, and identifier to guide a type-safe fix, then rerun the same focused analysis. Run broader analysis only when the fix affects shared behavior or targeted results indicate it is needed.
 - Build the packaged CLI: `composer run build`
 
 ## Coding-agent guidance
@@ -107,8 +108,6 @@ When making code changes, aim for:
 - regression coverage when changing inference logic
 
 The real purpose of this repo is not to be a generic framework. It is a compact, data-source-driven schema generator that infers usable SQL or Laravel Blueprint definitions from sample records. That purpose should guide all implementation choices.
-
-When the user requests phpstan fixes to a specific file, run `./vendor/bin/phpstan analyse <path-to-file.php>` (for example, `./vendor/bin/phpstan analyse src/Console.php`).
 
 When making changes to `README.md`, instead make those changes to `scripts/build-readme.php` and run `composer build:readme`.
 

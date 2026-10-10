@@ -106,7 +106,7 @@ Options:
             if ($runningPhar === 'infer-laravel-blueprint') {
                 $this->filename = basename($runningPhar);
             }
-        } elseif (isset($_SERVER['argv'][0]) && ! empty($_SERVER['argv'][0]) && basename($_SERVER['argv'][0]) === 'infer-laravel-blueprint') {
+        } elseif (isset($_SERVER['argv'][0]) && $_SERVER['argv'][0] !== '' && basename($_SERVER['argv'][0]) === 'infer-laravel-blueprint') {
             $this->filename = basename($_SERVER['argv'][0]);
         }
     }
@@ -254,9 +254,9 @@ Options:
                 return 1;
             }
         } else {
-            if (! \str_starts_with($source, '/') && ! \preg_match('/^[a-zA-Z]:\\\\/', $source)) {
+            if (! \str_starts_with($source, '/') && \preg_match('/^[a-zA-Z]:\\\\/', $source) !== 1) {
                 if (! file_exists($source)) {
-                    if (is_string($currentWorkingDirectory) && ! empty($currentWorkingDirectory)) {
+                    if (is_string($currentWorkingDirectory) && $currentWorkingDirectory !== '') {
                         $resolved = $currentWorkingDirectory.\DIRECTORY_SEPARATOR.$source;
                         if (file_exists($resolved)) {
                             $source = $resolved;
@@ -270,14 +270,14 @@ Options:
 
                         return 1;
                     }
-                } elseif (! is_string($currentWorkingDirectory) || empty($currentWorkingDirectory)) {
+                } elseif (! is_string($currentWorkingDirectory) || $currentWorkingDirectory === '') {
                     $currentWorkingDirectory = \dirname($source);
                 }
             } elseif (! file_exists($source)) {
                 $this->writeError(sprintf('File path \'%s\' could not be found.', $source));
 
                 return 1;
-            } elseif (! is_string($currentWorkingDirectory) || empty($currentWorkingDirectory)) {
+            } elseif (! is_string($currentWorkingDirectory) || $currentWorkingDirectory === '') {
                 $currentWorkingDirectory = \dirname($source);
             }
         }
@@ -297,7 +297,7 @@ Options:
         }
 
         if (\is_a($parserClass, BlueprintParserInterface::class, true)) {
-            if (! is_string($blueprintOptions['model']) || empty($blueprintOptions['model'])) {
+            if (! is_string($blueprintOptions['model']) || $blueprintOptions['model'] === '') {
                 $this->writeError('Error: The --model option must be provided and must be a non-empty string.');
 
                 return 1;
@@ -343,7 +343,13 @@ Options:
                         $blueprintContent
                     );
                 } else {
-                    $outputDirectory = realpath($currentWorkingDirectory ?? getcwd());
+                    $workingDirectory = $currentWorkingDirectory ?? getcwd();
+                    if ($workingDirectory === false) {
+                        $this->writeError('Error: Unable to resolve the output directory.');
+
+                        return 1;
+                    }
+                    $outputDirectory = realpath($workingDirectory);
                     if ($outputDirectory === false) {
                         $this->writeError('Error: Unable to resolve the output directory.');
 
@@ -369,13 +375,13 @@ Options:
     public static function help(?string $filename = null): string
     {
         $runningPhar = \Phar::running(false);
-        if (! $filename) {
+        if ($filename === null || $filename === '') {
             $filename = 'index.php';
             if ($runningPhar !== '') {
                 if ($runningPhar === 'infer-laravel-blueprint') {
                     $filename = basename($runningPhar);
                 }
-            } elseif (isset($_SERVER['argv'][0]) && ! empty($_SERVER['argv'][0]) && basename($_SERVER['argv'][0]) === 'infer-laravel-blueprint') {
+            } elseif (isset($_SERVER['argv'][0]) && $_SERVER['argv'][0] !== '' && basename($_SERVER['argv'][0]) === 'infer-laravel-blueprint') {
                 $filename = basename($_SERVER['argv'][0]);
             }
         }
@@ -468,7 +474,7 @@ Options:
     private function writeUsage(string $message = ''): void
     {
         $output = str_replace('{filename}', $this->filename, self::HELP);
-        if ($message) {
+        if ($message !== '') {
             $output = $message."\n".$output;
         }
         $this->writeToStream(

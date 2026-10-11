@@ -91,7 +91,7 @@ final class ColumnTypeInferrer implements ColumnTypeInferrerInterface
             $type = $this->resolveType($stats, $databaseType);
             switch ($databaseType) {
                 case DatabaseType::MySQL:
-                    if (! \in_array($type, [MySQLColumnType::Boolean->value, MySQLColumnType::Bit->value])) {
+                    if (! \in_array($type, [MySQLColumnType::Boolean->value, MySQLColumnType::Bit->value], true)) {
                         $modifiers[] = ColumnModifier::Unsigned;
                     }
                     break;

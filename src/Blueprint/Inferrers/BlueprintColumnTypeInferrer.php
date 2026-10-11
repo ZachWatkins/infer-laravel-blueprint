@@ -95,7 +95,7 @@ final class BlueprintColumnTypeInferrer implements BlueprintColumnTypeInferrerIn
         if ($type === LaravelColumnType::char && $stats->allStringLengthsSame) {
             return [(string) $stats->maxStringLength];
         }
-        if (\in_array($type, [LaravelColumnType::enum, LaravelColumnType::set], true) && ! empty($stats->getSeenValues())) {
+        if (\in_array($type, [LaravelColumnType::enum, LaravelColumnType::set], true) && $stats->getSeenValues() !== []) {
             return $stats->getSeenValues();
         }
 

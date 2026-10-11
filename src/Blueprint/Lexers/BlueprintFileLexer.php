@@ -15,7 +15,7 @@ class BlueprintFileLexer
     {
         $tree = $this->toTree($config);
         $output = '';
-        if ($tree['models']) {
+        if ($tree['models'] !== []) {
             $output .= "models:\n";
             foreach ($tree['models'] as $modelName => $columns) {
                 $output .= "  {$modelName}:\n";
@@ -24,8 +24,8 @@ class BlueprintFileLexer
                 }
             }
         }
-        if ($tree['controllers']) {
-            if ($tree['models']) {
+        if ($tree['controllers'] !== []) {
+            if ($tree['models'] !== []) {
                 $output .= "\n";
             }
             $output .= "controllers:\n";
@@ -43,8 +43,8 @@ class BlueprintFileLexer
                 }
             }
         }
-        if ($tree['seeders']) {
-            if ($tree['controllers']) {
+        if ($tree['seeders'] !== []) {
+            if ($tree['controllers'] !== []) {
                 $output .= "\n";
             }
             $output .= 'seeders: '.\implode(', ', $tree['seeders']);
@@ -88,11 +88,11 @@ class BlueprintFileLexer
                 $tree['models'][$model->name][$column->getName()] = implode(' ', $values);
             }
             $controller = $this->getControllerTree($model, $config);
-            if (! empty($controller)) {
+            if ($controller !== []) {
                 $tree['controllers'][$model->name] = $controller;
             }
         }
-        if ($config->seeders) {
+        if ($config->seeders === true) {
             foreach ($config->getModels() as $model) {
                 $tree['seeders'][] = $model->name;
             }
@@ -162,14 +162,12 @@ class BlueprintFileLexer
             ],
         ];
         $result = [];
-        if ($config->resources) {
-            $resources = \implode(', ', \array_filter(\array_map(fn ($resource) => $resource->value, $config->resources)));
-            if ($resources) {
-                $result['resource'] = $resources;
-            }
+        if ($config->resources !== []) {
+            $resources = \implode(', ', \array_map(fn ($resource) => $resource->value, $config->resources));
+            $result['resource'] = $resources;
         }
         foreach (\array_keys($template) as $templateMethod) {
-            if (\in_array($templateMethod, $config->methods)) {
+            if (\in_array($templateMethod, $config->methods, true)) {
                 $result[$templateMethod] = $template[$templateMethod];
             }
         }
@@ -246,7 +244,7 @@ class BlueprintFileLexer
             ],
         ];
         $result = [];
-        if ($config->resources) {
+        if ($config->resources !== []) {
             // Extract web-related resource declarations and move them to the controllers, since Laravel Shift Blueprint does not resolve these shorthands for Inertia views at this time.
             $filteredResources = array_flip(array_map(fn ($resource) => $resource->value, $config->resources));
             $webResourceMethods = [];
@@ -263,10 +261,10 @@ class BlueprintFileLexer
                     unset($filteredResources[$method]);
                 }
             }
-            if (! empty($filteredResources)) {
+            if ($filteredResources !== []) {
                 $result['resource'] = implode(', ', array_keys($filteredResources));
             }
-            if (! empty($webResourceMethods)) {
+            if ($webResourceMethods !== []) {
                 foreach (\array_keys($template) as $method) {
                     if (isset($webResourceMethods[$method])) {
                         $result[$method] = $template[$method];
@@ -316,22 +314,17 @@ class BlueprintFileLexer
             if (is_array($actions)) {
                 foreach ($actions as $action => $parameters) {
                     if (is_string($parameters)) {
-                        $resolved = $this->resolveModelControllerPlaceholder($parameters, $model);
-                        if ($resolved !== $tree[$method][$action]) {
-                            $tree[$method][$action] = $resolved;
-                        }
+                        $actions[$action] = $this->resolveModelControllerPlaceholder($parameters, $model);
                     } elseif (is_array($parameters)) {
                         foreach ($parameters as $key => $value) {
                             if (is_string($value)) {
-                                $resolved = $this->resolveModelControllerPlaceholder($value, $model);
-                                if ($resolved !== $parameters[$key]) {
-                                    $parameters[$key] = $resolved;
-                                }
+                                $parameters[$key] = $this->resolveModelControllerPlaceholder($value, $model);
                             }
                         }
-                        $tree[$method][$action] = $parameters;
+                        $actions[$action] = $parameters;
                     }
                 }
+                $tree[$method] = $actions;
             }
         }
 

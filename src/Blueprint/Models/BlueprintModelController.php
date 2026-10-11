@@ -21,7 +21,7 @@ class BlueprintModelController
         protected bool $resource = false,
     ) {
         $invalidMethods = array_diff($methodsParam, self::METHODS);
-        if (! empty($invalidMethods)) {
+        if ($invalidMethods !== []) {
             throw new \RuntimeException(
                 'Invalid controller methods: '.implode(', ', $invalidMethods).'. Accepts: '.implode(', ', self::METHODS)
             );
@@ -42,25 +42,18 @@ class BlueprintModelController
             'inertia' => 'inertia',
             default => 'render',
         };
+        $resources = [];
+
         foreach ($methodsParam as $method) {
             switch ($method) {
                 case 'resource':
-                    if (! isset($tree['resource'])) {
-                        $tree['resource'] = [];
-                    }
-                    $tree['resource'][] = true;
+                    $resources[] = true;
                     break;
                 case 'resource:api':
-                    if (! isset($tree['resource'])) {
-                        $tree['resource'] = [];
-                    }
-                    $tree['resource'][] = 'api';
+                    $resources[] = 'api';
                     break;
                 case 'resource:web':
-                    if (! isset($tree['resource'])) {
-                        $tree['resource'] = [];
-                    }
-                    $tree['resource'][] = 'web';
+                    $resources[] = 'web';
                     break;
                 case 'index':
                     $renderValue = match ($this->view) {
@@ -160,6 +153,10 @@ class BlueprintModelController
                     $tree['invokable'] = true;
                     break;
             }
+        }
+
+        if ($resources !== []) {
+            $tree['resource'] = $resources;
         }
 
         return $tree;

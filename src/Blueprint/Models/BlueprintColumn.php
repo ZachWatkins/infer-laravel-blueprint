@@ -44,7 +44,7 @@ final class BlueprintColumn implements BlueprintColumnInterface
 
     public function hasAttributes(): bool
     {
-        return ! empty($this->attributes);
+        return $this->attributes !== [];
     }
 
     /**
@@ -57,7 +57,7 @@ final class BlueprintColumn implements BlueprintColumnInterface
 
     public function hasModifiers(): bool
     {
-        return ! empty($this->modifiers);
+        return $this->modifiers !== [];
     }
 
     public function hasModifier(ColumnModifier $modifier): bool

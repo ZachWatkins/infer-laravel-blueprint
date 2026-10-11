@@ -155,6 +155,8 @@ final class HttpParser implements BlueprintParserInterface
     }
 
     /**
+     * Extracts the list of records from the given HTTP response body array. Returns null if no valid record list is found. Allows partial record lists and nested structures.
+     *
      * @param  array<mixed>  $body
      * @return list<array<string, mixed>>|null
      */
@@ -164,22 +166,27 @@ final class HttpParser implements BlueprintParserInterface
             return $body;
         }
 
-        $arrayValues = [];
+        $arrayValue = null;
         foreach ($body as $value) {
             if (\is_array($value)) {
-                $arrayValues[] = $value;
+                $arrayValue = $value;
+                break;
             }
         }
 
-        if (\count($arrayValues) !== 1 || ! $this->isRecordList($arrayValues[0])) {
+        if ($arrayValue === null || ! $this->isRecordList($arrayValue)) {
             return null;
         }
 
-        return $arrayValues[0];
+        return $arrayValue;
     }
 
     /**
+     * Determines if the given array represents a list of records. A record list is a non-empty list of associative arrays with string keys.
+     *
      * @param  array<mixed>  $value
+     *
+     * @phpstan-assert-if-true list<array<string, mixed>> $value
      */
     private function isRecordList(array $value): bool
     {
@@ -190,6 +197,12 @@ final class HttpParser implements BlueprintParserInterface
         foreach ($value as $record) {
             if (! \is_array($record) || \array_is_list($record)) {
                 return false;
+            }
+
+            foreach ($record as $key => $_) {
+                if (! \is_string($key)) {
+                    return false;
+                }
             }
         }
 

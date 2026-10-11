@@ -6,6 +6,7 @@ namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Models;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollectionInterface;
 
 /**
  * @property string $name
@@ -16,11 +17,11 @@ class BlueprintModel
 {
     protected Inflector $inflector;
 
-    public readonly BlueprintColumnCollection $columns;
+    public readonly BlueprintColumnCollectionInterface $columns;
 
     public function __construct(
         public string $name,
-        BlueprintColumnCollection $columns
+        BlueprintColumnCollectionInterface $columns
     ) {
         $this->columns = $columns;
         $this->inflector = InflectorFactory::create()->build();

@@ -7,4 +7,4 @@ if ((${#staged_php_files[@]} == 0)); then
 fi
 
 ./vendor/bin/pint --repair --format=txt -- "${staged_php_files[@]}"
-./vendor/bin/phpstan analyse "${staged_php_files[@]}"
+./vendor/bin/phpstan analyse "${staged_php_files[@]}" --error-format=raw

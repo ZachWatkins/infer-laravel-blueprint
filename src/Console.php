@@ -13,7 +13,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterf
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser as BlueprintHttpParser;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpResponseSizeLimitException;
 use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\ParserInterface as SQLParserInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
@@ -306,7 +306,7 @@ Options:
             /** @var BlueprintParserInterface $parser */
             if ($isHttpSource) {
                 $maxResponseBytes = $this->maxHttpResponseBytes();
-                $parser = new BlueprintHttpParser(
+                $parser = new HttpParser(
                     $this->httpClient ?? $this->createHttpClient($httpTimeout, $maxResponseBytes),
                     parser: new $parserClass,
                     sourceExtension: $sourceExtension,

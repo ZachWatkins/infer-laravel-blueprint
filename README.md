@@ -30,7 +30,7 @@ Running `php index.php --model=User path/to/users.csv` will produce the followin
 ```yaml
 models:
   User:
-    id: tinyIncrements unique unsigned auto_increment
+    id: id
     name: tinyText unique
     locale: char:5 unique
     birthdate: date unique
@@ -77,7 +77,7 @@ To use this file with Laravel Shift Blueprint in an existing Laravel application
 php artisan blueprint:build user-blueprint.yaml
 ```
 
-The CLI supports CSV, JSON, XML, and Excel files (`.xlsx`, `.xls`, and `.ods`). With `--format=blueprint`, it also accepts an HTTP or HTTPS URL. The URL path extension selects the matching parser and default `Accept` header (`text/csv`, `application/json`, `application/xml`, or the matching spreadsheet media type); query strings do not affect format detection. URLs without an extension default to JSON. HTTP sources use a single GET request. Add or override request headers with repeatable `--http-header=<name>:<value>` options (note: the CLI rejects attempts to use credential headers for security purposes). Set `--http-timeout=<seconds>` to control the timeout for each HTTP request; it defaults to 30 seconds and accepts 1-3600 seconds. Before downloading, the CLI sends a HEAD request and rejects responses whose declared length exceeds one quarter of remaining PHP memory, capped at 64 MiB. The same ceiling is enforced on the download:
+The CLI supports CSV, JSON, XML, and Excel files (`.xlsx`, `.xls`, and `.ods`) or an HTTP or HTTPS URL. The URL path extension selects the matching parser and default `Accept` header (`text/csv`, `application/json`, `application/xml`, or the matching spreadsheet media type); query strings do not affect format detection. URLs without an extension default to JSON. HTTP sources use a single GET request. Add or override request headers with repeatable `--http-header=<name>:<value>` options (note: the CLI rejects attempts to use credential headers for security purposes). Set `--http-timeout=<seconds>` to control the timeout for each HTTP request; it defaults to 30 seconds and accepts 1-3600 seconds. Before downloading, the CLI sends a HEAD request and rejects responses whose declared length exceeds one quarter of remaining PHP memory, capped at 64 MiB. The same ceiling is enforced on the download:
 
 ```sh
 php index.php --model=Post --http-header="User-Agent: MyApp" https://jsonplaceholder.typicode.com/posts
@@ -160,7 +160,7 @@ file_put_contents('user-blueprint.yaml', $result);
 
 // models:
 //   User:
-//     id: tinyIncrements unique unsigned auto_increment
+//     id: id
 //     name: tinyText unique
 //     locale: char:5 unique
 //     birthdate: date unique

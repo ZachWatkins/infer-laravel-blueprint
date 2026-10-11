@@ -13,7 +13,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterf
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser as BlueprintHttpParser;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpResponseSizeLimitException;
 use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\ParserInterface as SQLParserInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
@@ -282,7 +282,8 @@ Options:
             }
         }
 
-        $parserClass = $this->resolveParserClass($source);
+        $sourceExtension = $this->sourceExtension($source, $isHttpSource) ?? ($isHttpSource ? 'json' : null);
+        $parserClass = $sourceExtension === null ? null : ($this->parserClasses[$sourceExtension] ?? null);
 
         if ($parserClass === null) {
             $this->writeUsage('Error: Unable to resolve parser class for the specified format and source.');
@@ -305,11 +306,11 @@ Options:
             /** @var BlueprintParserInterface $parser */
             if ($isHttpSource) {
                 $maxResponseBytes = $this->maxHttpResponseBytes();
-                $parser = new BlueprintHttpParser(
+                $parser = new HttpParser(
                     $this->httpClient ?? $this->createHttpClient($httpTimeout, $maxResponseBytes),
                     parser: new $parserClass,
-                    sourceExtension: $this->sourceExtension($source) ?? 'json',
-                    accept: $this->resolveHttpAccept($this->sourceExtension($source) ?? 'json'),
+                    sourceExtension: $sourceExtension,
+                    accept: $this->resolveHttpAccept($sourceExtension),
                     headers: $httpHeaders,
                     maxResponseBytes: $maxResponseBytes,
                 );
@@ -399,9 +400,9 @@ Options:
     /**
      * Resolves a source extension, using the URL path rather than its query string.
      */
-    private function sourceExtension(string $source): ?string
+    private function sourceExtension(string $source, bool $isHttpSource): ?string
     {
-        $path = $this->isHttpSource($source) ? \parse_url($source, \PHP_URL_PATH) : $source;
+        $path = $isHttpSource ? \parse_url($source, \PHP_URL_PATH) : $source;
         $extension = \strtolower(\pathinfo(\is_string($path) ? $path : $source, \PATHINFO_EXTENSION));
 
         return $extension === '' ? null : $extension;
@@ -458,17 +459,6 @@ Options:
         }
 
         return \min(self::MAX_HTTP_RESPONSE_BYTES, \max(1, \intdiv($availableMemoryBytes, 4)));
-    }
-
-    private function resolveParserClass(string $source): ?string
-    {
-        $extension = $this->sourceExtension($source) ?? ($this->isHttpSource($source) ? 'json' : null);
-
-        if ($extension === null) {
-            return null;
-        }
-
-        return $this->parserClasses[$extension] ?? null;
     }
 
     private function writeUsage(string $message = ''): void

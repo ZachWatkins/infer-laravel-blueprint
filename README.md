@@ -30,7 +30,7 @@ Running `php index.php --model=User path/to/users.csv` will produce the followin
 ```yaml
 models:
   User:
-    id: tinyIncrements unique unsigned auto_increment
+    id: id
     name: tinyText unique
     locale: char:5 unique
     birthdate: date unique
@@ -160,7 +160,7 @@ file_put_contents('user-blueprint.yaml', $result);
 
 // models:
 //   User:
-//     id: tinyIncrements unique unsigned auto_increment
+//     id: id
 //     name: tinyText unique
 //     locale: char:5 unique
 //     birthdate: date unique

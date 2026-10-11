@@ -12,5 +12,6 @@ Resolve reported PHPStan errors for the requested PHP file with the fewest targe
 3. Update the PHPStan baseline if necessary, using `composer exec -- phpstan analyse --generate-baseline`.
 4. Rerun the same targeted analysis command and confirm it passes. Do not run the full suite unless the change needs broader validation.
 5. Report the change and the verification result. Do not modify unrelated files or pre-existing worktree changes.
+6. If the changes were successful and the PHPStan validation now passes, run `composer exec -- phpstan analyse --generate-baseline` to update the baseline.
 
 Read surrounding code only when needed to understand an error or preserve the file's existing conventions. Do not add ignores, baseline entries, casts, or assertions solely to silence PHPStan.

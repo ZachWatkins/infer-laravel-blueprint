@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Parameter \#1 \$array \(non\-empty\-array\<int, ''api''\|''api\.destroy''\|''api\.index''\|''api\.show''\|''api\.store''\|''api\.update''\|''create''\|''destroy''\|''edit''\|''index''\|''show''\|''store''\|''update''\|''web''\>\) to function array_filter does not contain falsy values, the array will always stay the same\.$#'
-			identifier: arrayFilter.same
-			count: 1
-			path: src/Blueprint/Lexers/BlueprintFileLexer.php
-
-		-
 			message: '#^Result of && is always false\.$#'
 			identifier: booleanAnd.alwaysFalse
 			count: 2

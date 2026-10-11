@@ -113,7 +113,7 @@ final class BlueprintColumnTypeInferrer implements BlueprintColumnTypeInferrerIn
             $modifiers[] = ColumnModifier::Nullable;
         }
 
-        if ($stats->isUnique()) {
+        if ($stats->isUnique() && $stats->totalCount > 1) {
             $modifiers[] = ColumnModifier::Unique;
         }
 
@@ -218,7 +218,7 @@ final class BlueprintColumnTypeInferrer implements BlueprintColumnTypeInferrerIn
         if ($stats->allYear) {
             return LaravelColumnType::year;
         }
-        if ($stats->allStringLengthsSame && $stats->maxStringLength <= 255) {
+        if ($stats->allStringLengthsSame && $stats->maxStringLength <= 255 && $stats->totalCount > 1) {
             return LaravelColumnType::char;
         }
         if ($stats->maxStringLength <= 255) {

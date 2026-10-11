@@ -31,12 +31,6 @@ parameters:
 			path: src/Console.php
 
 		-
-			message: '#^Parameter \#2 \$columns of class ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Models\\BlueprintModel constructor expects ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Models\\BlueprintColumnCollection, ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Interfaces\\BlueprintColumnCollectionInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Console.php
-
-		-
 			message: '#^Variable \$parser in PHPDoc tag @var does not exist\.$#'
 			identifier: varTag.variableNotFound
 			count: 1

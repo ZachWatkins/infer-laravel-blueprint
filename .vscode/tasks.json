@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install Infer Laravel Blueprint Skill",
+      "type": "shell",
+      "command": "composer",
+      "args": ["install:skill"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

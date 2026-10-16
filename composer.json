@@ -41,6 +41,7 @@
         "lint:fix": "pint --parallel --max-processes=4",
         "build": [
             "composer install --no-dev",
+            "@php scripts/download-ca-certificates.php",
             "@php scripts/build-skill.php",
             "@php -d phar.readonly=0 scripts/build-phar.php",
             "composer install",
@@ -51,6 +52,7 @@
         "build:skill": "php scripts/build-skill.php",
         "install:skill": [
             "composer install --no-dev",
+            "@php scripts/download-ca-certificates.php",
             "@php scripts/build-skill.php",
             "@php -d phar.readonly=0 scripts/build-phar.php",
             "composer install",

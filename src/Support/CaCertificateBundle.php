@@ -38,7 +38,7 @@ final class CaCertificateBundle
         } else {
             $bundlePath = \dirname(__DIR__, 2).'/resources/cacert.pem';
             if (! \is_file($bundlePath)) {
-                throw new \RuntimeException(\sprintf('CA certificate bundle not found at %s.', $bundlePath));
+                self::downloadBundle($bundlePath);
             }
 
             $resolvedPath = \realpath($bundlePath);
@@ -71,5 +71,45 @@ final class CaCertificateBundle
         });
 
         return self::$path = $temporaryPath;
+    }
+
+    private static function downloadBundle(string $bundlePath): void
+    {
+        $sourceUrl = 'https://curl.se/ca/cacert.pem';
+        $context = \stream_context_create([
+            'http' => ['timeout' => 30],
+            'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
+        ]);
+        $contents = \file_get_contents($sourceUrl, false, $context);
+        if ($contents === false) {
+            throw new \RuntimeException(\sprintf('Unable to download the CA certificate bundle from %s.', $sourceUrl));
+        }
+
+        if (! \str_contains($contents, '-----BEGIN CERTIFICATE-----')
+            || ! \str_contains($contents, '-----END CERTIFICATE-----')) {
+            throw new \RuntimeException(\sprintf('Downloaded CA certificate bundle from %s is invalid.', $sourceUrl));
+        }
+
+        $directoryPath = \dirname($bundlePath);
+        if (! \is_dir($directoryPath) && ! \mkdir($directoryPath, 0777, true) && ! \is_dir($directoryPath)) {
+            throw new \RuntimeException(\sprintf('Unable to create the CA certificate directory at %s.', $directoryPath));
+        }
+
+        $temporaryPath = \tempnam($directoryPath, 'cacert-');
+        if ($temporaryPath === false) {
+            throw new \RuntimeException('Unable to create a temporary CA certificate file.');
+        }
+
+        if (\file_put_contents($temporaryPath, $contents) === false) {
+            \unlink($temporaryPath);
+
+            throw new \RuntimeException('Unable to save the downloaded CA certificate bundle.');
+        }
+
+        if (! \rename($temporaryPath, $bundlePath)) {
+            \unlink($temporaryPath);
+
+            throw new \RuntimeException(\sprintf('Unable to save the CA certificate bundle at %s.', $bundlePath));
+        }
     }
 }

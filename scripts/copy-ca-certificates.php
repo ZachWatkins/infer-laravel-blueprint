@@ -1,13 +1,16 @@
 <?php
 
 declare(strict_types=1);
+use ZachWatkins\InferLaravelBlueprint\Support\CaCertificateBundle;
 
 $projectRoot = dirname(__DIR__);
-$certificatePath = $projectRoot.'/resources/cacert.pem';
-
-if (! is_file($certificatePath)) {
-    throw new RuntimeException(sprintf('CA certificate bundle not found at %s.', $certificatePath));
+$autoloadPath = $projectRoot.'/vendor/autoload.php';
+if (! is_file($autoloadPath)) {
+    throw new RuntimeException(sprintf('Composer autoloader not found at %s.', $autoloadPath));
 }
+require $autoloadPath;
+
+$certificatePath = CaCertificateBundle::path();
 
 $executables = glob($projectRoot.'/build/*/*');
 if ($executables === false) {

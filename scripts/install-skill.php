@@ -1,90 +1,75 @@
 <?php
 
 /**
- * Copy the agent skill and all script files to ~/.copilot/skills/infer-laravel-blueprint in a way that is compatible with Mac, Linux, and Windows.
+ * Copy the PHP application and agent skill to the global Copilot skill directory.
  */
 
 declare(strict_types=1);
 
 $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 
-// Get the --destination option from the command line arguments.
-$destination = $isWindows
-    ? getenv('USERPROFILE').'\\.copilot\\skills\\infer-laravel-blueprint\\'
-    : getenv('HOME').'/.copilot/skills/infer-laravel-blueprint/';
+$homeDirectory = getenv($isWindows ? 'USERPROFILE' : 'HOME');
+if (! is_string($homeDirectory) || $homeDirectory === '') {
+    throw new RuntimeException('Unable to determine the home directory.');
+}
+
+$destination = $homeDirectory.DIRECTORY_SEPARATOR.'.copilot'.DIRECTORY_SEPARATOR.'skills'.DIRECTORY_SEPARATOR.'infer-laravel-blueprint';
 foreach ($argv as $arg) {
     if (str_starts_with($arg, '--destination=')) {
-        $destination = realpath(substr($arg, strlen('--destination=')));
-        if (! $destination) {
-            throw new RuntimeException('Invalid destination path.');
-        }
-        if (! is_dir($destination)) {
-            throw new RuntimeException('Destination path is not a directory.');
-        }
+        $destination = substr($arg, strlen('--destination='));
         break;
     }
 }
 
-$architecture = php_uname('m');
-if (! in_array($architecture, ['x86_64', 'arm64', 'AMD64'])) {
-    throw new RuntimeException(sprintf('Unsupported architecture: %s', $architecture));
+if (! is_dir($destination) && ! mkdir($destination, 0777, true) && ! is_dir($destination)) {
+    throw new RuntimeException(sprintf('Unable to create the skill directory at %s.', $destination));
 }
-$phpackerFilePath = match (true) {
-    PHP_OS_FAMILY === 'Darwin' => match ($architecture) {
-        'x86_64', 'AMD64' => 'build/mac/mac-x64',
-        'arm64' => 'build/mac/mac-arm',
-        default => throw new RuntimeException(sprintf('Unsupported architecture: %s', $architecture)),
-    },
-    ! $isWindows => match ($architecture) {
-        'x86_64', 'AMD64' => 'build/linux/linux-x64',
-        'arm64' => 'build/linux/linux-arm',
-        default => throw new RuntimeException(sprintf('Unsupported architecture: %s', $architecture)),
-    },
-    $isWindows => 'build/windows/windows-x64',
-    default => throw new RuntimeException(sprintf('Unsupported platform: %s', PHP_OS_FAMILY)),
+
+$projectRoot = dirname(__DIR__);
+$copyFile = static function (string $source, string $target): void {
+    if (! copy($source, $target)) {
+        throw new RuntimeException(sprintf('Unable to copy %s to %s.', $source, $target));
+    }
 };
 
-if (! $isWindows) {
-    if (is_dir($destination)) {
-        // Empty the directory before copying new files.
-        $files = glob($destination.'/*');
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                shell_exec(sprintf('rm -rf %s', escapeshellarg($file)));
-            } else {
-                unlink($file);
+$copyDirectory = static function (string $source, string $target) use ($copyFile): void {
+    if (! is_dir($target) && ! mkdir($target, 0777, true) && ! is_dir($target)) {
+        throw new RuntimeException(sprintf('Unable to create directory %s.', $target));
+    }
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($source, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+
+    foreach ($iterator as $fileInfo) {
+        $relativePath = substr($fileInfo->getPathname(), strlen($source) + 1);
+        $targetPath = $target.DIRECTORY_SEPARATOR.$relativePath;
+
+        if ($fileInfo->isDir()) {
+            if (! is_dir($targetPath) && ! mkdir($targetPath, 0777, true) && ! is_dir($targetPath)) {
+                throw new RuntimeException(sprintf('Unable to create directory %s.', $targetPath));
             }
+
+            continue;
         }
-    } else {
-        mkdir($destination, 0777, true);
-    }
-    copy('LICENSE', $destination.'/LICENSE');
-    copy('SKILL.md', $destination.'/SKILL.md');
-    $binaryDestination = $destination.'/infer-laravel-blueprint';
-    if (! copy($phpackerFilePath, $binaryDestination)) {
-        throw new RuntimeException(sprintf('Unable to copy the executable from %s to %s.', $phpackerFilePath, $binaryDestination));
-    }
-    if (! chmod($binaryDestination, 0755)) {
-        throw new RuntimeException(sprintf('Unable to make the executable at %s executable.', $binaryDestination));
-    }
-} else {
-    if (is_dir($destination)) {
-        // Empty the directory before copying new files.
-        $files = glob($destination.'\\*');
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                shell_exec(sprintf('rmdir /S /Q %s', escapeshellarg($file)));
-            } else {
-                unlink($file);
-            }
+
+        $targetDirectory = dirname($targetPath);
+        if (! is_dir($targetDirectory) && ! mkdir($targetDirectory, 0777, true) && ! is_dir($targetDirectory)) {
+            throw new RuntimeException(sprintf('Unable to create directory %s.', $targetDirectory));
         }
-    } else {
-        mkdir($destination, 0777, true);
+
+        $copyFile($fileInfo->getPathname(), $targetPath);
     }
-    copy('LICENSE', $destination.'/LICENSE');
-    copy('SKILL.md', $destination.'/SKILL.md');
-    $binaryDestination = $destination.'\\infer-laravel-blueprint';
-    if (! copy($phpackerFilePath, $binaryDestination)) {
-        throw new RuntimeException(sprintf('Unable to copy the executable from %s to %s.', $phpackerFilePath, $binaryDestination));
-    }
+};
+
+$copyFile($projectRoot.'/LICENSE', $destination.DIRECTORY_SEPARATOR.'LICENSE');
+$copyFile($projectRoot.'/SKILL.md', $destination.DIRECTORY_SEPARATOR.'SKILL.md');
+$copyFile($projectRoot.'/index.php', $destination.DIRECTORY_SEPARATOR.'index.php');
+$copyDirectory($projectRoot.'/src', $destination.DIRECTORY_SEPARATOR.'src');
+$copyDirectory($projectRoot.'/vendor', $destination.DIRECTORY_SEPARATOR.'vendor');
+
+$obsoleteExecutable = $destination.DIRECTORY_SEPARATOR.'infer-laravel-blueprint';
+if (is_file($obsoleteExecutable) && ! unlink($obsoleteExecutable)) {
+    throw new RuntimeException(sprintf('Unable to remove obsolete executable %s.', $obsoleteExecutable));
 }

@@ -11,13 +11,21 @@ use ZachWatkins\InferLaravelBlueprint\Console;
 require __DIR__.'/../vendor/autoload.php';
 
 $template = <<<README
-# Infer Data Schema
+# Infer Laravel Blueprint
 
 **This is not intended to be used in production environments. It is only intended for development and testing purposes.**
 
 [![Test](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/test.yml/badge.svg)](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/test.yml) [![Audit](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/audit.yml/badge.svg)](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/audit.yml)
 
 This PHP library performs limited inference of the SQL column schema for a given data source and can either provide those details or a [Laravel Shift Blueprint](https://blueprint.laravelshift.com/) YAML file, which can then be used to scaffold the relevant [Laravel](https://laravel.com/) PHP framework files which implement that data model into an existing application.
+
+## Table of Contents
+
+- [Example CLI usage](#example-cli-usage)
+- [Install as a coding agent skill](#install-as-a-coding-agent-skill)
+- [Library usage](#library-usage)
+- [Development](#development)
+- [Additional Resources](#additional-resources)
 
 ## Example CLI usage
 

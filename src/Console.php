@@ -432,6 +432,7 @@ Options:
         $factory = new Psr17Factory;
 
         return new CurlClient($factory, $factory, [
+            \CURLOPT_SSL_OPTIONS => CURLSSLOPT_NATIVE_CA,
             \CURLOPT_CONNECTTIMEOUT => $timeout,
             \CURLOPT_MAXFILESIZE_LARGE => $maxResponseBytes,
             \CURLOPT_TIMEOUT => $timeout,

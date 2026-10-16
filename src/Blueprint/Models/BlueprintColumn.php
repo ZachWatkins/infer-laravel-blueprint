@@ -30,6 +30,7 @@ final class BlueprintColumn implements BlueprintColumnInterface
         if (str_ends_with($sanitized, '_id')) {
             $sanitized .= '_original';
         }
+
         return $sanitized;
     }
 

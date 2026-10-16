@@ -26,7 +26,12 @@ final class BlueprintColumn implements BlueprintColumnInterface
 
     public function getName(): string
     {
-        return $this->name;
+        $sanitized = trim(preg_replace('/[^a-zA-Z0-9_]+/', '_', trim($this->name)) ?? '', '_');
+        if (str_ends_with($sanitized, '_id')) {
+            $sanitized .= '_original';
+        }
+
+        return $sanitized;
     }
 
     public function getType(): LaravelColumnType

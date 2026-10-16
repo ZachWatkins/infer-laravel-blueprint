@@ -106,7 +106,7 @@ If the user does not provide a value for an option, ask a short follow-up questi
 5. If the user wants to build Laravel framework files using the generated Blueprint file:
    - Confirm their workspace directory includes a `artisan` file.
    - Confirm their workspace directory includes a `composer.json` file.
-   - Confirm their workspace's `composer.json` file includes `laravel-shift/blueprint` as a dependency. If not, install it using `composer require --dev laravel-shift/blueprint`.
+   - Confirm their workspace's `composer.json` file includes `laravel-shift/blueprint` and `jasonmccreary/laravel-test-assertions` as dependencies. If not, install them using `composer require --dev laravel-shift/blueprint jasonmccreary/laravel-test-assertions`.
    - Run `php artisan blueprint:build <model-blueprint.yaml>`, replacing `<model-blueprint.yaml>` with the actual file name of the generated Blueprint YAML file.
 
 ## Decision Points

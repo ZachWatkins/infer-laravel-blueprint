@@ -84,6 +84,7 @@ try {
     buildPharArchive(getcwd(), getcwd().'/.phar/infer-laravel-blueprint.phar', [
         'src',
         'vendor',
+        'resources',
         'index.php',
         'composer.json',
     ]);

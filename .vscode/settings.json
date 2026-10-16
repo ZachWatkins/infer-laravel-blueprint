@@ -1,0 +1,51 @@
+{
+  "editor.detectIndentation": false,
+  "editor.minimap.enabled": false,
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "editor.stickyScroll.enabled": true,
+  "editor.stickyScroll.defaultModel": "foldingProviderModel",
+  "editor.tabCompletion": "on",
+  "editor.tabSize": 4,
+  "editor.wordWrap": "on",
+  "files.autoSave": "afterDelay",
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false,
+    "editor.tabSize": 2
+  },
+  "Laravel.pint.runOnSave": true,
+  "[php]": {
+    "editor.defaultFormatter": "laravel.vscode-laravel",
+  },
+  "php.validate.run": "onSave",
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.defaultColorDecorators": "never",
+    "editor.quickSuggestions": {
+      "strings": "on"
+    }
+  },
+  "chat.tools.terminal.autoApprove": {
+    "composer": true,
+    "npm": true,
+    "/^php vendor\/bin\/pint\\b/": true,
+    "/^php vendor\/bin\/pest\\b/": true
+  },
+  "git.autofetch": true,
+  "github.copilot.enable": {
+    "*": true,
+    "env": false,
+    "csv": false,
+  },
+  "githubPullRequests.assignCreated": "${user}",
+  "githubPullRequests.createOnPublishBranch": "always",
+  "githubPullRequests.deleteBranchAfterMerge": true,
+  "githubPullRequests.postDone": "checkoutDefaultBranchAndPull",
+  "githubPullRequests.webviewRefreshInterval": 10
+}

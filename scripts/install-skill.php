@@ -31,8 +31,8 @@ if (! in_array($architecture, ['x86_64', 'arm64', 'AMD64'])) {
 }
 $phpackerFilePath = match (true) {
     PHP_OS_FAMILY === 'Darwin' => match ($architecture) {
-        'x86_64', 'AMD64' => '/build/mac/mac-x64',
-        'arm64' => '/build/mac/mac-arm',
+        'x86_64', 'AMD64' => 'build/mac/mac-x64',
+        'arm64' => 'build/mac/mac-arm',
         default => throw new RuntimeException(sprintf('Unsupported architecture: %s', $architecture)),
     },
     ! $isWindows => match ($architecture) {
@@ -60,7 +60,13 @@ if (! $isWindows) {
     }
     copy('LICENSE', $destination.'/LICENSE');
     copy('SKILL.md', $destination.'/SKILL.md');
-    copy($phpackerFilePath, $destination.'/infer-laravel-blueprint');
+    $binaryDestination = $destination.'/infer-laravel-blueprint';
+    if (! copy($phpackerFilePath, $binaryDestination)) {
+        throw new RuntimeException(sprintf('Unable to copy the executable from %s to %s.', $phpackerFilePath, $binaryDestination));
+    }
+    if (! chmod($binaryDestination, 0755)) {
+        throw new RuntimeException(sprintf('Unable to make the executable at %s executable.', $binaryDestination));
+    }
 } else {
     if (is_dir($destination)) {
         // Empty the directory before copying new files.
@@ -77,5 +83,8 @@ if (! $isWindows) {
     }
     copy('LICENSE', $destination.'/LICENSE');
     copy('SKILL.md', $destination.'/SKILL.md');
-    copy($phpackerFilePath, $destination.'\\infer-laravel-blueprint');
+    $binaryDestination = $destination.'\\infer-laravel-blueprint';
+    if (! copy($phpackerFilePath, $binaryDestination)) {
+        throw new RuntimeException(sprintf('Unable to copy the executable from %s to %s.', $phpackerFilePath, $binaryDestination));
+    }
 }

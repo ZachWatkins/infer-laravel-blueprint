@@ -14,15 +14,15 @@ description: "Use when: generating a Laravel Shift Blueprint YAML file from a da
 
 # Laravel Shift Blueprint Generator
 
-ONLY EXECUTE the `infer-laravel-blueprint` CLI tool located at `./infer-laravel-blueprint`. Additionally, you may run `composer require laravel-shift/blueprint` if the user wants to install the required dependency for their Laravel project when using the blueprint that `infer-laravel-blueprint` creates. DO NOT use python, composer, or any other CLI tool as a feature of this skill.
-ONLY READ files created by the `infer-laravel-blueprint` CLI tool.
+ONLY EXECUTE this skill's PHP application by running `php <installed-skill-directory>/index.php`. Additionally, you may run `composer require laravel-shift/blueprint` if the user wants to install the required dependency for their Laravel project when using the Blueprint that this application creates. DO NOT use python, composer, or any other CLI tool as a feature of this skill.
+ONLY READ files created by the PHP application.
 DO NOT WRITE OR MODIFY any files yourself when using this skill.
-DO NOT search for files unless they are parameters for the `infer-laravel-blueprint` CLI tool.
+DO NOT search for files unless they are parameters for the PHP application.
 The project workspace is the VS Code workspace folder where the user is running the commands.
 
 ## Context and Scope
 
-You are operating as a global skill. You must ground all of your responses, logic, and generation in the context of the user's active, open VS Code workspace directory. You will invoke the `infer-laravel-blueprint` CLI tool as specified in the command template.
+You are operating as a global skill. You must ground all of your responses, logic, and generation in the context of the user's active, open VS Code workspace directory. Invoke this skill's installed `index.php` using PHP as specified in the command template.
 
 ## CLI Usage
 
@@ -35,17 +35,19 @@ You are operating as a global skill. You must ground all of your responses, logi
 Before performing the primary task, you must:
 
 1. Get the root directory of the open project workspace to use as the `--cwd` parameter.
-2. Ensure the `infer-laravel-blueprint` CLI parameters only read files from and save files to the open VS Code workspace folder.
+2. Ensure the PHP application's parameters only read files from and save files to the open VS Code workspace folder.
 
 ## Purpose
+
+Invoke the skill's installed application with PHP using `index.php` as its entry point.
 
 Use the `infer-laravel-blueprint` CLI tool in this repository to transform a JSON, CSV, XLSX, or XML dataset into a Laravel Shift Blueprint YAML file. The skill converts a natural-language request into the correct command, asks for any missing CLI options, and verifies the generated output.
 
 ## File Access Boundaries
 
 - Do not read any data source provided to the script.
-- If the task requires behavior not described in `infer-laravel-blueprint --help`, inform the user of this limitation and any error message thrown.
-- Treat `infer-laravel-blueprint` as the single source of truth for supported flags, arguments, and validation rules.
+- If the task requires behavior not described in `php <installed-skill-directory>/index.php --help`, inform the user of this limitation and any error message thrown.
+- Treat `php <installed-skill-directory>/index.php --help` as the single source of truth for supported flags, arguments, and validation rules.
 - Only read and write files within the open VS Code workspace folder.
 
 ## Required Inputs
@@ -74,7 +76,7 @@ If the user does not provide a value for an option, ask a short follow-up questi
    - The user should not need to provide the --cwd option explicitly; use the project workspace as the default value.
 
 3. Build the command.
-   - Use the CLI entry point: `infer-laravel-blueprint`
+   - Use `php <installed-skill-directory>/index.php` as the CLI entry point.
    - Add only the flags that the user provided or that you confirmed.
    - Preserve quoting for file paths and URLs.
 
@@ -138,6 +140,6 @@ The task is complete only when:
 - and any errors are explained clearly if the generation fails.
 SKILL;
 
-$skill = sprintf($template, Console::help('infer-laravel-blueprint'));
+$skill = sprintf($template, Console::help('php index.php'));
 
 file_put_contents('SKILL.md', $skill);

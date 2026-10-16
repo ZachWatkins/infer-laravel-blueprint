@@ -6,8 +6,6 @@
 
 This PHP library performs limited inference of the SQL column schema for a given data source and can either provide those details or a [Laravel Shift Blueprint](https://blueprint.laravelshift.com/) YAML file, which can then be used to scaffold the relevant [Laravel](https://laravel.com/) PHP framework files which implement that data model into an existing application.
 
-
-
 ## Table of Contents
 
 - [Example CLI usage](#example-cli-usage)
@@ -131,17 +129,19 @@ Options:
 
 ## Install as a coding agent skill
 
-To install the standalone executable CLI application as a system-wide GitHub Copilot agent skill at ~/.copilot/skills/infer-laravel-blueprint, clone this repository and then run the following command:
+To install the PHP source application as a system-wide GitHub Copilot agent skill at `~/.copilot/skills/infer-laravel-blueprint`, clone this repository and then run the following command. The install includes `index.php`, the application source, and its production dependencies; PHP is required to run it. The installed CLI entry point is `php ~/.copilot/skills/infer-laravel-blueprint/index.php`:
 
 ```sh
 composer install:skill
 ```
 
-If you use a different coding agent, you can run these commands replacing `path` with the folder you want to install the skill to:
+If you use a different coding agent, you can install the generated skill and PHP application to a custom folder by replacing `path` with the destination:
 
 ```sh
-composer build
+composer install --no-dev
+composer build:skill
 php scripts/install-skill.php --destination=path
+composer install
 ```
 
 ## Library usage
@@ -233,17 +233,19 @@ To build the library as a standalone executable CLI application, run the followi
 composer build
 ```
 
-To install the standalone executable CLI application as a system-wide GitHub Copilot agent skill, run the following command:
+To install the PHP source application as a system-wide GitHub Copilot agent skill, run the following command:
 
 ```sh
 composer install:skill
 ```
 
-If you use a different coding agent, you can run these commands replacing `path` with the folder you want to install the skill to:
+To install the generated skill and PHP application to a custom folder, run these commands replacing `path` with the destination:
 
 ```sh
-composer build
+composer install --no-dev
+composer build:skill
 php scripts/install-skill.php --destination=path
+composer install
 ```
 
 ## Additional Resources

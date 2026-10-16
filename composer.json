@@ -51,10 +51,8 @@
         "install:skill": [
             "composer install --no-dev",
             "@php scripts/build-skill.php",
-            "@php -d phar.readonly=0 scripts/build-phar.php",
-            "composer install",
-            "phpacker build",
-            "@php scripts/install-skill.php"
+            "@php scripts/install-skill.php",
+            "composer install"
         ]
     },
     "config": {

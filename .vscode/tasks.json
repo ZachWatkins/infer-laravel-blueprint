@@ -10,6 +10,36 @@
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
+    },
+    {
+        "label": "Build Skill",
+        "type": "shell",
+        "command": "composer",
+        "args": ["build:skill"],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": []
+    },
+    {
+        "label": "Build Readme",
+        "type": "shell",
+        "command": "composer",
+        "args": ["build:readme"],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": []
+    },
+    {
+        "label": "Build Test Fixtures",
+        "type": "shell",
+        "command": "composer",
+        "args": ["test:build"],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": []
     }
   ]
 }

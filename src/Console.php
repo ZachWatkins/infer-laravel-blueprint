@@ -16,6 +16,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpResponseSizeLimitException;
 use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\ParserInterface as SQLParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Support\CaCertificateBundle;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
 
 final class Console
@@ -432,7 +433,7 @@ Options:
         $factory = new Psr17Factory;
 
         return new CurlClient($factory, $factory, [
-            \CURLOPT_SSL_OPTIONS => CURLSSLOPT_NATIVE_CA,
+            \CURLOPT_CAINFO => CaCertificateBundle::path(),
             \CURLOPT_CONNECTTIMEOUT => $timeout,
             \CURLOPT_MAXFILESIZE_LARGE => $maxResponseBytes,
             \CURLOPT_TIMEOUT => $timeout,

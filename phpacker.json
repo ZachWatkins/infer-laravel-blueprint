@@ -2,5 +2,6 @@
     "src": "./.phar/infer-laravel-blueprint.phar",
     "dest": "./build",
     "php": "8.5",
-    "platform": "all"
+    "platform": "all",
+    "ini": "./phpacker.ini"
 }

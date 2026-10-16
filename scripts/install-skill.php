@@ -60,6 +60,9 @@ if (! $isWindows) {
     }
     copy('LICENSE', $destination.'/LICENSE');
     copy('SKILL.md', $destination.'/SKILL.md');
+    if (! copy('resources/cacert.pem', $destination.'/cacert.pem')) {
+        throw new RuntimeException(sprintf('Unable to copy the CA certificate bundle to %s.', $destination.'/cacert.pem'));
+    }
     $binaryDestination = $destination.'/infer-laravel-blueprint';
     if (! copy($phpackerFilePath, $binaryDestination)) {
         throw new RuntimeException(sprintf('Unable to copy the executable from %s to %s.', $phpackerFilePath, $binaryDestination));
@@ -83,6 +86,9 @@ if (! $isWindows) {
     }
     copy('LICENSE', $destination.'/LICENSE');
     copy('SKILL.md', $destination.'/SKILL.md');
+    if (! copy('resources/cacert.pem', $destination.'\\cacert.pem')) {
+        throw new RuntimeException(sprintf('Unable to copy the CA certificate bundle to %s.', $destination.'\\cacert.pem'));
+    }
     $binaryDestination = $destination.'\\infer-laravel-blueprint';
     if (! copy($phpackerFilePath, $binaryDestination)) {
         throw new RuntimeException(sprintf('Unable to copy the executable from %s to %s.', $phpackerFilePath, $binaryDestination));

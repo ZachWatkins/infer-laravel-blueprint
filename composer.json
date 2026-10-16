@@ -44,7 +44,8 @@
             "@php scripts/build-skill.php",
             "@php -d phar.readonly=0 scripts/build-phar.php",
             "composer install",
-            "phpacker build"
+            "phpacker build",
+            "@php scripts/copy-ca-certificates.php"
         ],
         "build:readme": "php scripts/build-readme.php",
         "build:skill": "php scripts/build-skill.php",
@@ -54,6 +55,7 @@
             "@php -d phar.readonly=0 scripts/build-phar.php",
             "composer install",
             "phpacker build",
+            "@php scripts/copy-ca-certificates.php",
             "@php scripts/install-skill.php"
         ]
     },

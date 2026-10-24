@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces;
 
 /**
- * Represents an ordered collection of inferred SQL columns.
+ * Represents an ordered collection of inferred Blueprint columns.
  *
  * @extends \IteratorAggregate<int, BlueprintColumnInterface>
  */

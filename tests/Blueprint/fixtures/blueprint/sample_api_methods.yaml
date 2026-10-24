@@ -1,0 +1,25 @@
+models:
+  Model:
+    id: id
+    name: tinyText unique
+    active: boolean unique
+    birthdate: date unique
+
+controllers:
+  Model:
+    index:
+      query: all:models
+      resource: collection:models
+    store:
+      validate: id, name, active, birthdate
+      save: model
+      resource: model
+    show:
+      resource: model
+    update:
+      validate: id, name, active, birthdate
+      update: model
+      resource: model
+    destroy:
+      delete: model
+      respond: 204

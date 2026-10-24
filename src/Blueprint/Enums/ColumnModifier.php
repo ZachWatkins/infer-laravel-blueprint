@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Enums;
 
 /**
- * Modifiers that describe additional constraints or attributes of a SQL column,
+ * Modifiers that describe additional constraints or attributes of a Blueprint column,
  * evaluated across every value observed for that column.
  */
 enum ColumnModifier: string

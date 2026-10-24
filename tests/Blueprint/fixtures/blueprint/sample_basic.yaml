@@ -1,0 +1,6 @@
+models:
+  Model:
+    id: id
+    name: tinyText unique
+    active: boolean unique
+    birthdate: date unique

@@ -8,7 +8,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollec
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnInterface;
 
 /**
- * An ordered collection of inferred SQL columns.
+ * An ordered collection of inferred Blueprint columns.
  *
  * @implements \IteratorAggregate<int, BlueprintColumnInterface>
  */

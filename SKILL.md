@@ -113,7 +113,6 @@ If the user does not provide a value for an option, ask a short follow-up questi
 
 - If the user wants to use the result to run Laravel Shift Blueprint to scaffold the Laravel code, then run `php artisan blueprint:build <model-blueprint.yaml>` in their project directory, replacing `<model-blueprint.yaml>` with the actual file name of the generated Blueprint YAML file.
 - If the user only wants to preview the generated Blueprint YAML without saving it, run the command without the `--save` flag and do not execute `php artisan blueprint:build`.
-- If the user wants to inspect a data file to determine a database schema, run the command with the `--db=<database_name>` and `--format=sql` flags.
 
 ## Quality Bar
 

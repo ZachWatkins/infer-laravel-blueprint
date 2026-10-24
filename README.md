@@ -1,10 +1,10 @@
 # Infer Laravel Blueprint
 
-**This is not intended to be used in production environments. It is only intended for development and testing purposes. You are welcome to use it and submit issues or pull requests which I may review at my discretion, but I cannot guarantee its stability or security in a production setting.**
+**This is not intended to be used in production environments. It is only intended for development and testing purposes.**
 
 [![Test](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/test.yml/badge.svg)](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/test.yml) [![Audit](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/audit.yml/badge.svg)](https://github.com/ZachWatkins/infer-laravel-blueprint/actions/workflows/audit.yml)
 
-This PHP library performs limited inference of the SQL column schema for a given data source and can either provide those details or a [Laravel Shift Blueprint](https://blueprint.laravelshift.com/) YAML file, which can then be used to scaffold the relevant [Laravel](https://laravel.com/) PHP framework files which implement that data model into an existing application.
+This PHP library infers a [Laravel Shift Blueprint](https://blueprint.laravelshift.com/) schema from a data source and generates a YAML file that can scaffold the relevant [Laravel](https://laravel.com/) PHP framework files for that data model.
 
 ## Table of Contents
 
@@ -256,4 +256,3 @@ php scripts/install-skill.php --destination=path
 - [Flow PHP ETL Excel Adapter](https://flow-php.com/documentation/components/adapters/excel/)
 - [Flow PHP ETL HTTP Adapter](https://flow-php.com/documentation/components/adapters/http/)
 - [Pest PHP](https://pestphp.com/docs/introduction)
-- [SQL Server Data Types](https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql)

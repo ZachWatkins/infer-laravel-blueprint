@@ -1,6 +1,6 @@
 {
     "name": "zachwatkins/infer-laravel-blueprint",
-    "description": "Infers the SQL column schema of a data source (CSV, JSON, XML, Excel, HTTP).",
+    "description": "Infers Laravel Shift Blueprint schemas from data sources (CSV, JSON, XML, Excel, HTTP).",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "stable",
@@ -34,8 +34,7 @@
         "test": "pest",
         "analyse": "phpstan analyse --no-progress",
         "test:build": [
-            "@php scripts/build-test-fixtures-blueprint.php",
-            "@php scripts/build-test-fixtures-sql.php"
+            "@php scripts/build-test-fixtures-blueprint.php"
         ],
         "lint": "pint --test --parallel --max-processes=4",
         "lint:fix": "pint --parallel --max-processes=4",

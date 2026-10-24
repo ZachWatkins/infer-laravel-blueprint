@@ -36,7 +36,7 @@ final class HttpReader implements DataReaderInterface
         $this->reader = $reader;
     }
 
-    public function read(string $source, string $databaseType = 'sqlite'): BlueprintColumnCollectionInterface
+    public function parse(string $source): BlueprintColumnCollectionInterface
     {
         HttpUrl::assertHasNoUserInfo($source);
 

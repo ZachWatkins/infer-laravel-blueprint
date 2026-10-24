@@ -13,9 +13,8 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintColumnCollection
 use ZachWatkins\InferLaravelBlueprint\Support\ColumnStats;
 
 /**
- * Evaluates every value of every column in a stream of rows to infer the safest possible
- * SQL column type and modifiers (nullable, unique, unsigned, auto-incrementing) for a
- * given database engine.
+ * Evaluates every value of every column in a stream of rows to infer Laravel Blueprint
+ * column types and modifiers (nullable, unique, unsigned, auto-incrementing).
  *
  * Blueprint readers share this inference logic so type selection is identical
  * regardless of the data source format.

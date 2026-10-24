@@ -9,6 +9,7 @@ use Nyholm\Psr7\Response;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
@@ -47,7 +48,7 @@ $runConsole = static function (array $argv, ?array $readerClasses = null, ?Clien
 };
 
 afterEach(function () {
-    $expectedSavePath = realpath(__DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/model-blueprint.yaml'));
+    $expectedSavePath = realpath(__DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../Blueprint/fixtures/data/model-blueprint.yaml'));
     if ($expectedSavePath && file_exists($expectedSavePath)) {
         unlink($expectedSavePath);
     }
@@ -62,9 +63,20 @@ it('prints usage when no source argument is provided', function () use ($runCons
         ->and($result['stderr'])->toContain('Default: 30 seconds. Accepts: 1-3600.');
 });
 
+it('rejects parser classes that do not implement the Blueprint parser contract', function () use ($runConsole) {
+    $dataFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../Blueprint/fixtures/data/sample.csv');
+    $result = $runConsole(
+        ['infer-laravel-blueprint', '--model=Model', $dataFixturePath],
+        parserClasses: ['csv' => \stdClass::class],
+    );
+
+    expect($result['exitCode'])->toBe(1)
+        ->and($result['stderr'])->toContain('does not implement '.BlueprintParserInterface::class);
+});
+
 it('outputs blueprint YAML file contents to the console if --save is not provided', function () use ($runConsole) {
-    $dataFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/test_mysql.csv');
-    $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/test_mysql_basic.yaml');
+    $dataFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../Blueprint/fixtures/data/sample.csv');
+    $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/sample_basic.yaml');
 
     $result = $runConsole(['infer-laravel-blueprint', '--model=Model', $dataFixturePath]);
 
@@ -77,8 +89,8 @@ it('outputs blueprint YAML file contents to the console if --save is not provide
 });
 
 it('outputs blueprint YAML from an HTTP source using an injected client', function () use ($runConsole) {
-    $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/test_mysql_basic.yaml');
-    $httpFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/test_mysql.http');
+    $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/sample_basic.yaml');
+    $httpFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../Blueprint/fixtures/data/sample.json');
     $client = new class($httpFixturePath) implements ClientInterface
     {
         public ?RequestInterface $lastRequest = null;
@@ -263,14 +275,14 @@ it('rejects an invalid HTTP timeout', function () use ($runConsole) {
         ->and($result['stderr'])->toContain('HTTP timeout must be an integer between 1 and 3600 seconds.');
 });
 
-it('selects a matching reader and Accept header for an HTTP file URL', function () use ($runConsole) {
-    $fixturesDirectory = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data');
+it('selects a matching parser and Accept header for an HTTP file URL', function () use ($runConsole) {
+    $fixturesDirectory = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../Blueprint/fixtures/data');
     $formats = [
-        ['csv', 'text/csv', 'test_mysql.csv'],
-        ['json', 'application/json', 'test_mysql.json'],
-        ['xml', 'application/xml', 'test_mysql.xml'],
-        ['xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'test_mysql.xlsx'],
-        ['xls', 'application/vnd.ms-excel', 'test_mysql.xlsx'],
+        ['csv', 'text/csv', 'sample.csv'],
+        ['json', 'application/json', 'sample.json'],
+        ['xml', 'application/xml', 'sample.xml'],
+        ['xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'sample.xlsx'],
+        ['xls', 'application/vnd.ms-excel', 'sample.xlsx'],
     ];
     $readerClasses = [
         'csv' => CsvReader::class,
@@ -319,9 +331,9 @@ it('selects a matching reader and Accept header for an HTTP file URL', function 
 });
 
 it('saves a blueprint YAML file to disk in same folder as data source if --save is provided', function () use ($runConsole) {
-    $dataFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/test_mysql.csv');
-    $expectedSavePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data/model-blueprint.yaml');
-    $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/test_mysql_basic.yaml');
+    $dataFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../Blueprint/fixtures/data/sample.csv');
+    $expectedSavePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../Blueprint/fixtures/data/model-blueprint.yaml');
+    $blueprintFixturePath = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../fixtures/blueprint/sample_basic.yaml');
     $result = $runConsole(['infer-laravel-blueprint', '--model=Model', '--save', $dataFixturePath]);
     expect(file_exists(realpath($expectedSavePath)))->toBeTrue();
     expect($result['exitCode'])->toBe(0)

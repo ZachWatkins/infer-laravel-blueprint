@@ -58,6 +58,7 @@ This is the key architectural rule: source-reading code should stay thin and sou
 
 ## Important project conventions
 
+- `blueprint/` is a protected, read-only Git submodule. Never create, modify, delete, format, build, or regenerate files inside it. Avoid commands that recursively process the workspace; pass explicit paths that exclude `blueprint/`.
 - Use PHP 8.3+ syntax and `declare(strict_types=1);` in all PHP files.
 - Follow PSR-12 style and use explicit type declarations on properties, parameters, and return values.
 - Prefer enums for supported types and modifiers instead of raw strings.

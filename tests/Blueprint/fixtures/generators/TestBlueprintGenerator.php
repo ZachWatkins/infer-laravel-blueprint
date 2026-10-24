@@ -6,7 +6,7 @@
 
 namespace Tests\Blueprint\Fixtures\Generators;
 
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintReaderInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
@@ -22,8 +22,8 @@ class TestBlueprintGenerator
      */
     public function generate(string $dataFilePath, string $blueprintFilePath, BlueprintConfig $config = new BlueprintConfig): void
     {
-        $parser = $this->resolveParser(basename($dataFilePath));
-        $columns = $parser->parse($dataFilePath);
+        $reader = $this->resolveReader(basename($dataFilePath));
+        $columns = $reader->read($dataFilePath);
         $model = new BlueprintModel('Model', $columns);
         $config->addModel($model);
         $lexer = new BlueprintFileLexer;
@@ -32,7 +32,7 @@ class TestBlueprintGenerator
         file_put_contents($blueprintFilePath, $output);
     }
 
-    private function resolveParser(string $dataFileName): BlueprintParserInterface
+    private function resolveReader(string $dataFileName): BlueprintReaderInterface
     {
         $extension = pathinfo($dataFileName, PATHINFO_EXTENSION);
         if (! $extension) {
@@ -40,13 +40,13 @@ class TestBlueprintGenerator
         }
         $className = '\\ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Readers\\'.ucfirst($extension).'Reader';
         if (! class_exists($className)) {
-            throw new \InvalidArgumentException("Parser class $className does not exist for file extension $extension");
+            throw new \InvalidArgumentException("Reader class $className does not exist for file extension $extension");
         }
-        $parser = new $className;
-        if (! $parser instanceof BlueprintParserInterface) {
-            throw new \InvalidArgumentException("Parser class $className must implement BlueprintParserInterface");
+        $reader = new $className;
+        if (! $reader instanceof BlueprintReaderInterface) {
+            throw new \InvalidArgumentException("Reader class $className must implement BlueprintReaderInterface");
         }
 
-        return $parser;
+        return $reader;
     }
 }

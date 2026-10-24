@@ -31,12 +31,6 @@ parameters:
 			path: src/Console.php
 
 		-
-			message: '#^Variable \$parser in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: src/Console.php
-
-		-
 			message: '#^The @implements tag of class ZachWatkins\\InferLaravelBlueprint\\SQL\\Models\\SQLColumnCollection describes IteratorAggregate but the class implements\: ZachWatkins\\InferLaravelBlueprint\\SQL\\Interfaces\\SQLColumnCollectionInterface$#'
 			identifier: generics.wrongParent
 			count: 1

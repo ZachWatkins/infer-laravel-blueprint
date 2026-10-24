@@ -5,7 +5,7 @@ This repository is a PHP schema-inference utility for turning raw tabular data i
 - a SQL schema (`src/SQL/...`), or
 - a Laravel Shift Blueprint definition (`src/Blueprint/...`).
 
-The library reads source data from CSV, JSON, XML, Excel, and HTTP endpoints using Flow PHP ETL and then infers column names, data types, and modifiers by scanning the values in each column. The project is intentionally opinionated: it tries to produce the safest general-purpose schema for a target database engine or Blueprint output, while keeping parser implementations thin and consistent.
+The library reads source data from CSV, JSON, XML, Excel, and HTTP endpoints using Flow PHP ETL and then infers column names, data types, and modifiers by scanning the values in each column. The project is intentionally opinionated: it tries to produce the safest general-purpose schema for a target database engine or Blueprint output, while keeping source parsers and readers thin and consistent.
 
 See [README.md](README.md) for a higher-level overview, usage examples, and dependency references.
 
@@ -25,7 +25,7 @@ In other words, most code changes should be framed around one question: "How doe
 
 ### CLI and entry points
 
-- `src/Console.php` is the command-line surface for the app. It accepts flags such as `--db`, `--format=sql|blueprint`, and Blueprint-specific options, then dispatches to the correct parser.
+- `src/Console.php` is the command-line surface for the app. It accepts flags such as `--db`, `--format=sql|blueprint`, and Blueprint-specific options, then dispatches to the correct SQL parser or Blueprint reader.
 - `index.php` is the application bootstrap that invokes the console.
 - `scripts/` contains packaging and helper scripts such as building the standalone binary.
 
@@ -40,7 +40,7 @@ In other words, most code changes should be framed around one question: "How doe
 
 ### Blueprint layer
 
-- `src/Blueprint/Readers/` mirrors the SQL parser structure for Blueprint output.
+- `src/Blueprint/Readers/` contains the source-specific readers for Blueprint output.
 - `src/Blueprint/Models/` contains Blueprint schema models.
 - `src/Blueprint/Inferrers/BlueprintColumnTypeInferrer.php` infers Laravel field types and Blueprint attributes from the same column stats.
 - `src/Blueprint/Enums/` defines Laravel type names and Blueprint annotations used in generated files.
@@ -48,13 +48,13 @@ In other words, most code changes should be framed around one question: "How doe
 
 ### Data source contract
 
-All parsers follow the same pattern:
+All source parsers and readers follow the same pattern:
 
 1. Read rows from a source with Flow PHP ETL.
 2. Feed the rows into the relevant inferrer.
 3. Return a typed collection of inferred columns.
 
-This is the key architectural rule: parser code should stay thin and source-specific; type detection should live in the inferrer layer.
+This is the key architectural rule: source-reading code should stay thin and source-specific; type detection should live in the inferrer layer.
 
 ## Important project conventions
 
@@ -62,8 +62,8 @@ This is the key architectural rule: parser code should stay thin and source-spec
 - Follow PSR-12 style and use explicit type declarations on properties, parameters, and return values.
 - Prefer enums for supported types and modifiers instead of raw strings.
 - Keep interfaces and contracts in the matching namespace (`src/SQL/Interfaces` or `src/Blueprint/Interfaces`).
-- Do not create a new parser or inferrer without updating the corresponding contract and tests.
-- Prefer reusing `ColumnStats` for cross-column analysis instead of duplicating inference rules in individual parser classes.
+- Do not create a new parser, reader, or inferrer without updating the corresponding contract and tests.
+- Prefer reusing `ColumnStats` for cross-column analysis instead of duplicating inference rules in individual parser or reader classes.
 - Keep `src/SQL/...` and `src/Blueprint/...` behavior symmetric where possible:
   - same source data
   - same column discovery logic
@@ -83,7 +83,7 @@ Before adding new functionality, confirm which layer owns the behavior:
 The project uses Pest. Add or update tests in the relevant area:
 
 - `tests/SQL/Feature/` for SQL inference and parser behavior
-- `tests/Blueprint/Feature/` for Blueprint inference and parser behavior
+- `tests/Blueprint/Feature/` for Blueprint inference and reader behavior
 - fixture files under `tests/SQL/fixtures/` and `tests/Blueprint/fixtures/` when the output depends on sample data
 
 Each test should validate real inference results from actual data, not mock-only behavior.
@@ -103,7 +103,7 @@ Each test should validate real inference results from actual data, not mock-only
 When making code changes, aim for:
 
 - small, focused edits
-- consistent interfaces between source parsers and inferrers
+- consistent interfaces between source parsers/readers and inferrers
 - explicit, descriptive naming
 - docblocks on public APIs and non-trivial methods
 - regression coverage when changing inference logic

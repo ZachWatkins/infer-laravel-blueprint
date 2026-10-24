@@ -10,7 +10,6 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollec
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnTypeInferrerInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintColumn;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintColumnCollection;
-use ZachWatkins\InferLaravelBlueprint\Parsers;
 use ZachWatkins\InferLaravelBlueprint\Support\ColumnStats;
 
 /**
@@ -18,9 +17,8 @@ use ZachWatkins\InferLaravelBlueprint\Support\ColumnStats;
  * SQL column type and modifiers (nullable, unique, unsigned, auto-incrementing) for a
  * given database engine.
  *
- * This is the single shared inference contract used by every parser in
- * {@see Parsers} so that type-selection behavior is
- * identical regardless of the data source format.
+ * Blueprint readers share this inference logic so type selection is identical
+ * regardless of the data source format.
  */
 final class BlueprintColumnTypeInferrer implements BlueprintColumnTypeInferrerInterface
 {
@@ -52,7 +50,7 @@ final class BlueprintColumnTypeInferrer implements BlueprintColumnTypeInferrerIn
             $columnStats = $stats[$column];
 
             // A row that never mentioned this column is treated exactly like an
-            // explicit null value, so parsers do not need to pre-normalize rows to a
+            // explicit null value, so readers do not need to pre-normalize rows to a
             // consistent superset of keys (e.g. optional fields in JSON/XML documents).
             for ($missing = $totalRows - $columnStats->totalCount; $missing > 0; $missing--) {
                 $columnStats->record(null);

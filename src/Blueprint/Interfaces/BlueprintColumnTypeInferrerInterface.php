@@ -12,7 +12,7 @@ namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces;
  * auto-incrementing).
  *
  * Rows do not need to share a consistent set of keys: a column absent from a given
- * row is treated the same as an explicit null value for that row, so parsers may
+ * row is treated the same as an explicit null value for that row, so readers may
  * pass rows exactly as extracted (e.g. optional fields in JSON/XML documents)
  * without pre-normalizing them to a superset of keys.
  */

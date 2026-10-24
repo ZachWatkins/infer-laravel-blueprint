@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZachWatkins\InferLaravelBlueprint\SQL\Inferrers;
 
-use ZachWatkins\InferLaravelBlueprint\Parsers;
 use ZachWatkins\InferLaravelBlueprint\SQL\Enums\ColumnModifier;
 use ZachWatkins\InferLaravelBlueprint\SQL\Enums\DatabaseType;
 use ZachWatkins\InferLaravelBlueprint\SQL\Enums\MySQLColumnType;

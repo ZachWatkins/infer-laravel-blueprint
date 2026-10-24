@@ -9,7 +9,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Enums\BlueprintConfigResource;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\DataReaderInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
@@ -78,22 +78,22 @@ Options:
     /**
      * @var array<string, class-string>
      */
-    private array $parserClasses;
+    private array $readerClasses;
 
     private ?ClientInterface $httpClient;
 
     /**
      * @param  resource|null  $stdout
      * @param  resource|null  $stderr
-     * @param  array<string, class-string>|null  $parserClasses
+     * @param  array<string, class-string>|null  $readerClasses
      * @param  ClientInterface|null  $httpClient  Optional PSR-18 client for HTTP sources.
      */
-    public function __construct($stdout = null, $stderr = null, ?array $parserClasses = null, ?ClientInterface $httpClient = null)
+    public function __construct($stdout = null, $stderr = null, ?array $readerClasses = null, ?ClientInterface $httpClient = null)
     {
         $this->stdout = $stdout ?? \STDOUT;
         $this->stderr = $stderr ?? \STDERR;
         $this->httpClient = $httpClient;
-        $this->parserClasses = $parserClasses ?? [
+        $this->readerClasses = $readerClasses ?? [
             'csv' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\CsvReader',
             'json' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\JsonReader',
             'xml' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\XmlReader',
@@ -284,43 +284,42 @@ Options:
         }
 
         $sourceExtension = $this->sourceExtension($source, $isHttpSource) ?? ($isHttpSource ? 'json' : null);
-        $parserClass = $sourceExtension === null ? null : ($this->parserClasses[$sourceExtension] ?? null);
+        $readerClass = $sourceExtension === null ? null : ($this->readerClasses[$sourceExtension] ?? null);
 
-        if ($parserClass === null) {
-            $this->writeUsage('Error: Unable to resolve parser class for the specified format and source.');
-
-            return 1;
-        }
-
-        if (! \class_exists($parserClass)) {
-            $this->writeError(\sprintf('Parser %s is not available.', $parserClass));
+        if ($readerClass === null) {
+            $this->writeUsage('Error: Unable to resolve reader class for the specified format and source.');
 
             return 1;
         }
 
-        if (\is_a($parserClass, BlueprintParserInterface::class, true)) {
+        if (! \class_exists($readerClass)) {
+            $this->writeError(\sprintf('Reader %s is not available.', $readerClass));
+
+            return 1;
+        }
+
+        if (\is_a($readerClass, DataReaderInterface::class, true)) {
             if (! is_string($blueprintOptions['model']) || $blueprintOptions['model'] === '') {
                 $this->writeError('Error: The --model option must be provided and must be a non-empty string.');
 
                 return 1;
             }
-            /** @var BlueprintParserInterface $parser */
             if ($isHttpSource) {
                 $maxResponseBytes = $this->maxHttpResponseBytes();
-                $parser = new HttpReader(
+                $reader = new HttpReader(
                     $this->httpClient ?? $this->createHttpClient($httpTimeout, $maxResponseBytes),
-                    parser: new $parserClass,
+                    reader: new $readerClass,
                     sourceExtension: $sourceExtension,
                     accept: $this->resolveHttpAccept($sourceExtension),
                     headers: $httpHeaders,
                     maxResponseBytes: $maxResponseBytes,
                 );
             } else {
-                $parser = new $parserClass;
+                $reader = new $readerClass;
             }
 
             try {
-                $columns = $parser->parse($source);
+                $columns = $reader->read($source);
             } catch (HttpResponseSizeLimitException|ClientExceptionInterface $exception) {
                 $this->writeError($exception->getMessage());
 
@@ -366,7 +365,7 @@ Options:
                 }
             }
         } else {
-            $this->writeError(\sprintf('Parser %s does not implement %s or %s.', $parserClass, SQLParserInterface::class, BlueprintParserInterface::class));
+            $this->writeError(\sprintf('Class %s does not implement %s or %s.', $readerClass, SQLParserInterface::class, DataReaderInterface::class));
 
             return 1;
         }

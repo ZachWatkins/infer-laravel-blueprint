@@ -20,7 +20,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\JsonReader;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\XmlReader;
 use ZachWatkins\InferLaravelBlueprint\Console;
 
-$runConsole = static function (array $argv, ?array $parserClasses = null, ?ClientInterface $httpClient = null): array {
+$runConsole = static function (array $argv, ?array $readerClasses = null, ?ClientInterface $httpClient = null): array {
     $stdout = \fopen('php://temp', 'w+');
     $stderr = \fopen('php://temp', 'w+');
 
@@ -28,7 +28,7 @@ $runConsole = static function (array $argv, ?array $parserClasses = null, ?Clien
         throw new \RuntimeException('Unable to create in-memory output streams.');
     }
 
-    $exitCode = (new Console($stdout, $stderr, $parserClasses, $httpClient))->run($argv);
+    $exitCode = (new Console($stdout, $stderr, $readerClasses, $httpClient))->run($argv);
 
     \rewind($stdout);
     \rewind($stderr);
@@ -167,7 +167,7 @@ it('rejects URL userinfo before sending an HTTP request', function () use ($runC
         ->and($result['stderr'])->toContain('HTTP URLs must not contain userinfo credentials.')
         ->and($client->requestCount)->toBe(0);
 
-    expect(fn () => (new HttpReader($client))->parse($source))
+    expect(fn () => (new HttpReader($client))->read($source))
         ->toThrow(\InvalidArgumentException::class, 'HTTP URLs must not contain userinfo credentials.');
     expect($client->requestCount)->toBe(0);
 });
@@ -216,9 +216,9 @@ it('rejects an oversized GET body when HEAD has no content length', function () 
         }
     };
 
-    $parser = new HttpReader($client, maxResponseBytes: 4);
+    $reader = new HttpReader($client, maxResponseBytes: 4);
 
-    expect(fn () => $parser->parse('https://example.com/users.json'))
+    expect(fn () => $reader->read('https://example.com/users.json'))
         ->toThrow(HttpResponseSizeLimitException::class);
     expect($client->methods)->toBe(['HEAD', 'GET']);
 });
@@ -244,9 +244,9 @@ it('stops reading an unknown-length response as soon as the limit is exceeded', 
         }
     };
 
-    $parser = new HttpReader($client, maxResponseBytes: 4);
+    $reader = new HttpReader($client, maxResponseBytes: 4);
 
-    expect(fn () => $parser->parse('https://example.com/users.json'))
+    expect(fn () => $reader->read('https://example.com/users.json'))
         ->toThrow(HttpResponseSizeLimitException::class);
     expect($bytesRead)->toBe(5);
 });
@@ -263,7 +263,7 @@ it('rejects an invalid HTTP timeout', function () use ($runConsole) {
         ->and($result['stderr'])->toContain('HTTP timeout must be an integer between 1 and 3600 seconds.');
 });
 
-it('selects a matching parser and Accept header for an HTTP file URL', function () use ($runConsole) {
+it('selects a matching reader and Accept header for an HTTP file URL', function () use ($runConsole) {
     $fixturesDirectory = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../../SQL/fixtures/data');
     $formats = [
         ['csv', 'text/csv', 'test_mysql.csv'],
@@ -272,7 +272,7 @@ it('selects a matching parser and Accept header for an HTTP file URL', function 
         ['xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'test_mysql.xlsx'],
         ['xls', 'application/vnd.ms-excel', 'test_mysql.xlsx'],
     ];
-    $parserClasses = [
+    $readerClasses = [
         'csv' => CsvReader::class,
         'json' => JsonReader::class,
         'xml' => XmlReader::class,
@@ -283,7 +283,7 @@ it('selects a matching parser and Accept header for an HTTP file URL', function 
 
     foreach ($formats as [$extension, $accept, $fixtureName]) {
         $fixturePath = $fixturesDirectory.DIRECTORY_SEPARATOR.$fixtureName;
-        $expectedColumns = (new $parserClasses[$extension])->parse($fixturePath);
+        $expectedColumns = (new $readerClasses[$extension])->read($fixturePath);
         $expectedOutput = (new BlueprintFileLexer)->toString(new BlueprintConfig(
             models: [new BlueprintModel('Model', $expectedColumns)],
         ));

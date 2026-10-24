@@ -7,18 +7,18 @@ namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Readers;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Inferrers\BlueprintColumnTypeInferrer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollectionInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnTypeInferrerInterface;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\DataReaderInterface;
 
 use function Flow\ETL\Adapter\JSON\from_json;
 use function Flow\ETL\DSL\data_frame;
 
-final class JsonReader implements BlueprintParserInterface
+final class JsonReader implements DataReaderInterface
 {
     public function __construct(
         private readonly BlueprintColumnTypeInferrerInterface $inferrer = new BlueprintColumnTypeInferrer,
     ) {}
 
-    public function parse(
+    public function read(
         string $source,
     ): BlueprintColumnCollectionInterface {
         $rows = data_frame()

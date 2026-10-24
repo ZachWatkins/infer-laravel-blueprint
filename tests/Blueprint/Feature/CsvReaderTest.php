@@ -7,8 +7,6 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Enums\BlueprintConfigView;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\CsvReader;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\JsonReader;
 
 it('infers the expected Blueprint file from the CSV fixture', function () {
     $dataFixture = dirname(__DIR__).str_replace('/', DIRECTORY_SEPARATOR, '/fixtures/data/sample.csv');

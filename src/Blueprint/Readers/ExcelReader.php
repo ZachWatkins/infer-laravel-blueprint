@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers;
+namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Readers;
 
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Inferrers\BlueprintColumnTypeInferrer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollectionInterface;
@@ -12,7 +12,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterf
 use function Flow\ETL\Adapter\Excel\DSL\from_excel;
 use function Flow\ETL\DSL\data_frame;
 
-final class ExcelParser implements BlueprintParserInterface
+final class ExcelReader implements BlueprintParserInterface
 {
     public function __construct(
         private readonly BlueprintColumnTypeInferrerInterface $inferrer = new BlueprintColumnTypeInferrer,

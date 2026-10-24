@@ -13,8 +13,8 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterf
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpResponseSizeLimitException;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\HttpReader;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\HttpResponseSizeLimitException;
 use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\ParserInterface as SQLParserInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\CaCertificateBundle;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
@@ -94,12 +94,12 @@ Options:
         $this->stderr = $stderr ?? \STDERR;
         $this->httpClient = $httpClient;
         $this->parserClasses = $parserClasses ?? [
-            'csv' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\CsvParser',
-            'json' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\JsonParser',
-            'xml' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\XmlParser',
-            'xlsx' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
-            'xls' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
-            'ods' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
+            'csv' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\CsvReader',
+            'json' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\JsonReader',
+            'xml' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\XmlReader',
+            'xlsx' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\ExcelReader',
+            'xls' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\ExcelReader',
+            'ods' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\ExcelReader',
         ];
 
         $runningPhar = \Phar::running(false);
@@ -307,7 +307,7 @@ Options:
             /** @var BlueprintParserInterface $parser */
             if ($isHttpSource) {
                 $maxResponseBytes = $this->maxHttpResponseBytes();
-                $parser = new HttpParser(
+                $parser = new HttpReader(
                     $this->httpClient ?? $this->createHttpClient($httpTimeout, $maxResponseBytes),
                     parser: new $parserClass,
                     sourceExtension: $sourceExtension,

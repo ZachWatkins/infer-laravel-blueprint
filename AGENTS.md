@@ -16,7 +16,7 @@ The main goal is not generic ETL. It is schema inference from sample data.
 - `src/SQL/Parsers/*Parser.php` load data from a source and return an instance of `SQLColumnCollection`.
 - `src/SQL/Inferrers/ColumnTypeInferrer.php` decides the SQL column type and modifiers by analyzing row values.
 - `src/SQL/Enums/*` define database-specific type families (`SQLite`, `MySQL`, `SQL Server`).
-- `src/Blueprint/Parsers/*Parser.php` do the same thing for Laravel Blueprint output rather than raw SQL.
+- `src/Blueprint/Readers/*Reader.php` do the same thing for Laravel Blueprint output rather than raw SQL.
 - `src/Blueprint/Inferrers/BlueprintColumnTypeInferrer.php` chooses Laravel column types and modifiers such as `nullable`, `unique`, `unsigned`, or `increments`.
 
 In other words, most code changes should be framed around one question: "How does this data source become a consistent schema object?"
@@ -40,7 +40,7 @@ In other words, most code changes should be framed around one question: "How doe
 
 ### Blueprint layer
 
-- `src/Blueprint/Parsers/` mirrors the SQL parser structure for Blueprint output.
+- `src/Blueprint/Readers/` mirrors the SQL parser structure for Blueprint output.
 - `src/Blueprint/Models/` contains Blueprint schema models.
 - `src/Blueprint/Inferrers/BlueprintColumnTypeInferrer.php` infers Laravel field types and Blueprint attributes from the same column stats.
 - `src/Blueprint/Enums/` defines Laravel type names and Blueprint annotations used in generated files.
@@ -73,7 +73,7 @@ This is the key architectural rule: parser code should stay thin and source-spec
 
 Before adding new functionality, confirm which layer owns the behavior:
 
-- If the change is about converting a data source into rows, it belongs in a parser under `src/SQL/Parsers/` or `src/Blueprint/Parsers/`.
+- If the change is about converting a data source into rows, it belongs in a parser under `src/SQL/Parsers/` or a reader under `src/Blueprint/Readers/`.
 - If the change is about interpreting values into a column type, it belongs in an inferrer.
 - If the change is about the emitted schema model, it belongs in the models or enums.
 - If the change affects CLI behavior or supported flags, it belongs in `src/Console.php`.

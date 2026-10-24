@@ -5,7 +5,7 @@ declare(strict_types=1);
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\CsvParser;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\CsvReader;
 use ZachWatkins\InferLaravelBlueprint\Console;
 
 require __DIR__.'/../vendor/autoload.php';
@@ -95,9 +95,9 @@ You can use the library to customize how the values from data sources are parsed
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\CsvParser;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\CsvReader;
 
-\$parser = new CsvParser();
+\$parser = new CsvReader();
 \$blueprintColumnCollection = \$parser->parse('path/to/your/file.csv');
 \$model = new BlueprintModel('Model', \$blueprintColumnCollection);
 \$config = new BlueprintConfig(
@@ -182,7 +182,7 @@ $exampleFile = 'id,name,locale,birthdate,accept_terms
 9,"Rahul Sharma",en-IN,1995-09-09,false';
 file_put_contents('test.csv', $exampleFile);
 
-$blueprintColumns = (new CsvParser)->parse('test.csv');
+$blueprintColumns = (new CsvReader)->parse('test.csv');
 $model = new BlueprintModel('User', $blueprintColumns);
 $config = new BlueprintConfig(
     models: [$model],

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers;
+namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Readers;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Client\ClientInterface;
@@ -13,7 +13,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnTypeIn
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
 
-final class HttpParser implements BlueprintParserInterface
+final class HttpReader implements BlueprintParserInterface
 {
     private readonly ?BlueprintParserInterface $parser;
 

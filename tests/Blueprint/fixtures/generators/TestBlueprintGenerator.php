@@ -38,7 +38,7 @@ class TestBlueprintGenerator
         if (! $extension) {
             throw new \InvalidArgumentException("Unable to determine the file extension for $dataFileName");
         }
-        $className = '\\ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Parsers\\'.ucfirst($extension).'Parser';
+        $className = '\\ZachWatkins\\InferLaravelBlueprint\\Blueprint\\Readers\\'.ucfirst($extension).'Reader';
         if (! class_exists($className)) {
             throw new \InvalidArgumentException("Parser class $className does not exist for file extension $extension");
         }

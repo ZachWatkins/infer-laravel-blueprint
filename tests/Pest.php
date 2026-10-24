@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-use ZachWatkins\InferLaravelBlueprint\SQL\Enums\DatabaseType;
-use ZachWatkins\InferLaravelBlueprint\SQL\Inferrers\ColumnTypeInferrer;
-use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\SQLColumnCollectionInterface;
-
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -23,11 +19,3 @@ use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\SQLColumnCollectionInterfac
 | Shared Test Helpers
 |--------------------------------------------------------------------------
 */
-
-/**
- * @param  array<int, array<string, mixed>>  $rows
- */
-function infer(array $rows, DatabaseType $databaseType = DatabaseType::SQLite): SQLColumnCollectionInterface
-{
-    return (new ColumnTypeInferrer)->infer($rows, $databaseType);
-}

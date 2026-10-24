@@ -36,7 +36,7 @@ final class HttpParser implements BlueprintParserInterface
         $this->parser = $parser;
     }
 
-    public function parse(string $source, string $databaseType = 'sqlite'): BlueprintColumnCollectionInterface
+    public function parse(string $source): BlueprintColumnCollectionInterface
     {
         HttpUrl::assertHasNoUserInfo($source);
 

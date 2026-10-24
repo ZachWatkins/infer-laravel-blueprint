@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+  <user>
+    <id>1</id>
+    <name>John Doe</name>
+    <active>true</active>
+    <birthdate>1990-01-01</birthdate>
+  </user>
+  <user>
+    <id>2</id>
+    <name>Jane Smith</name>
+    <active>false</active>
+    <birthdate>1992-02-02</birthdate>
+  </user>
+</users>

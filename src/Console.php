@@ -15,7 +15,6 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpResponseSizeLimitException;
-use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\ParserInterface as SQLParserInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\CaCertificateBundle;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
 
@@ -298,77 +297,76 @@ Options:
             return 1;
         }
 
-        if (\is_a($parserClass, BlueprintParserInterface::class, true)) {
-            if (! is_string($blueprintOptions['model']) || $blueprintOptions['model'] === '') {
-                $this->writeError('Error: The --model option must be provided and must be a non-empty string.');
-
-                return 1;
-            }
-            /** @var BlueprintParserInterface $parser */
-            if ($isHttpSource) {
-                $maxResponseBytes = $this->maxHttpResponseBytes();
-                $parser = new HttpParser(
-                    $this->httpClient ?? $this->createHttpClient($httpTimeout, $maxResponseBytes),
-                    parser: new $parserClass,
-                    sourceExtension: $sourceExtension,
-                    accept: $this->resolveHttpAccept($sourceExtension),
-                    headers: $httpHeaders,
-                    maxResponseBytes: $maxResponseBytes,
-                );
-            } else {
-                $parser = new $parserClass;
-            }
-
-            try {
-                $columns = $parser->parse($source);
-            } catch (HttpResponseSizeLimitException|ClientExceptionInterface $exception) {
-                $this->writeError($exception->getMessage());
-
-                return 1;
-            }
-            $model = new BlueprintModel($blueprintOptions['model'], $columns);
-
-            if (! $dryRun) {
-                $lexer = new BlueprintFileLexer;
-                $blueprintContent = $lexer->toString(
-                    new BlueprintConfig(
-                        models: [$model],
-                        resources: $blueprintOptions['resources'],
-                        methods: $blueprintOptions['methods'],
-                        seeders: $blueprintOptions['seeders'],
-                        view: $blueprintOptions['view'],
-                    )
-                );
-                if (! $save) {
-                    $this->writeToStream(
-                        $this->stdout,
-                        $blueprintContent
-                    );
-                } else {
-                    $workingDirectory = $currentWorkingDirectory ?? getcwd();
-                    if ($workingDirectory === false) {
-                        $this->writeError('Error: Unable to resolve the output directory.');
-
-                        return 1;
-                    }
-                    $outputDirectory = realpath($workingDirectory);
-                    if ($outputDirectory === false) {
-                        $this->writeError('Error: Unable to resolve the output directory.');
-
-                        return 1;
-                    }
-                    $destinationPath = $outputDirectory.DIRECTORY_SEPARATOR.$model->tableNameSingular.'-blueprint.yaml';
-                    file_put_contents($destinationPath, $blueprintContent);
-                    $this->writeToStream(
-                        $this->stdout,
-                        sprintf('Blueprint file saved to %s', $destinationPath)
-                    );
-                }
-            }
-        } else {
-            $this->writeError(\sprintf('Parser %s does not implement %s or %s.', $parserClass, SQLParserInterface::class, BlueprintParserInterface::class));
+        if (! \is_a($parserClass, BlueprintParserInterface::class, true)) {
+            $this->writeError(\sprintf('Parser %s does not implement %s.', $parserClass, BlueprintParserInterface::class));
 
             return 1;
+        }
+        if (! is_string($blueprintOptions['model']) || $blueprintOptions['model'] === '') {
+            $this->writeError('Error: The --model option must be provided and must be a non-empty string.');
+
+            return 1;
+        }
+        /** @var BlueprintParserInterface $parser */
+        if ($isHttpSource) {
+            $maxResponseBytes = $this->maxHttpResponseBytes();
+            $parser = new HttpParser(
+                $this->httpClient ?? $this->createHttpClient($httpTimeout, $maxResponseBytes),
+                parser: new $parserClass,
+                sourceExtension: $sourceExtension,
+                accept: $this->resolveHttpAccept($sourceExtension),
+                headers: $httpHeaders,
+                maxResponseBytes: $maxResponseBytes,
+            );
+        } else {
+            $parser = new $parserClass;
+        }
+
+        try {
+            $columns = $parser->parse($source);
+        } catch (HttpResponseSizeLimitException|ClientExceptionInterface $exception) {
+            $this->writeError($exception->getMessage());
+
+            return 1;
+        }
+        $model = new BlueprintModel($blueprintOptions['model'], $columns);
+
+        if (! $dryRun) {
+            $lexer = new BlueprintFileLexer;
+            $blueprintContent = $lexer->toString(
+                new BlueprintConfig(
+                    models: [$model],
+                    resources: $blueprintOptions['resources'],
+                    methods: $blueprintOptions['methods'],
+                    seeders: $blueprintOptions['seeders'],
+                    view: $blueprintOptions['view'],
+                )
+            );
+            if (! $save) {
+                $this->writeToStream(
+                    $this->stdout,
+                    $blueprintContent
+                );
+            } else {
+                $workingDirectory = $currentWorkingDirectory ?? getcwd();
+                if ($workingDirectory === false) {
+                    $this->writeError('Error: Unable to resolve the output directory.');
+
+                    return 1;
+                }
+                $outputDirectory = realpath($workingDirectory);
+                if ($outputDirectory === false) {
+                    $this->writeError('Error: Unable to resolve the output directory.');
+
+                    return 1;
+                }
+                $destinationPath = $outputDirectory.DIRECTORY_SEPARATOR.$model->tableNameSingular.'-blueprint.yaml';
+                file_put_contents($destinationPath, $blueprintContent);
+                $this->writeToStream(
+                    $this->stdout,
+                    sprintf('Blueprint file saved to %s', $destinationPath)
+                );
+            }
         }
 
         return 0;

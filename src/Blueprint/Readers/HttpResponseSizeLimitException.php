@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers;
+namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Readers;
 
 final class HttpResponseSizeLimitException extends \RuntimeException
 {

@@ -7,12 +7,12 @@ namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces;
 /**
  * Reads a data source and infers its Laravel Blueprint columns.
  */
-interface BlueprintParserInterface
+interface DataReaderInterface
 {
     /**
-     * @param  string  $source  Path or URI to the data source to parse.
+     * @param  string  $source  Path or URI to the data source to read.
      */
-    public function parse(
+    public function read(
         string $source
     ): BlueprintColumnCollectionInterface;
 }

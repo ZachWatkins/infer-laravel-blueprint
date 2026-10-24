@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers;
+namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Readers;
 
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Inferrers\BlueprintColumnTypeInferrer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollectionInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnTypeInferrerInterface;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\DataReaderInterface;
 
 use function Flow\ETL\Adapter\XML\from_xml;
 use function Flow\ETL\DSL\data_frame;
 
-final class XmlParser implements BlueprintParserInterface
+final class XmlReader implements DataReaderInterface
 {
     public function __construct(
         private readonly string $xmlNodePath = '',
         private readonly BlueprintColumnTypeInferrerInterface $inferrer = new BlueprintColumnTypeInferrer,
     ) {}
 
-    public function parse(
+    public function read(
         string $source,
     ): BlueprintColumnCollectionInterface {
         $rawRows = data_frame()->read(from_xml($source, $this->xmlNodePath))->getEachAsArray();
@@ -34,7 +34,7 @@ final class XmlParser implements BlueprintParserInterface
     private function flatten(iterable $rawRows): \Generator
     {
         foreach ($rawRows as $rawRow) {
-            $element = $this->parseFragment($this->fragment($rawRow));
+            $element = $this->readFragment($this->fragment($rawRow));
 
             foreach ($this->recordElements($element) as $recordElement) {
                 yield $this->flattenElement($recordElement);
@@ -64,7 +64,7 @@ final class XmlParser implements BlueprintParserInterface
         return $this->normalizeFragment($fragment);
     }
 
-    private function parseFragment(string $fragment): \SimpleXMLElement
+    private function readFragment(string $fragment): \SimpleXMLElement
     {
         $previous = \libxml_use_internal_errors(true);
 

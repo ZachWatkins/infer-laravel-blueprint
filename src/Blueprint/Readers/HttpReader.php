@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers;
+namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Readers;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Client\ClientInterface;
@@ -10,16 +10,16 @@ use Psr\Http\Message\StreamInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Inferrers\BlueprintColumnTypeInferrer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollectionInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnTypeInferrerInterface;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\DataReaderInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
 
-final class HttpParser implements BlueprintParserInterface
+final class HttpReader implements DataReaderInterface
 {
-    private readonly ?BlueprintParserInterface $parser;
+    private readonly ?DataReaderInterface $reader;
 
     /**
      * @param  list<array{string, string}>  $headers
-     * @param  BlueprintParserInterface|null  $parser  File parser used for non-JSON response formats.
+     * @param  DataReaderInterface|null  $reader  File reader used for non-JSON response formats.
      * @param  string  $sourceExtension  Extension used for the temporary response file.
      * @param  string  $accept  Default HTTP Accept media type.
      * @param  int  $maxResponseBytes  Maximum response body size in bytes.
@@ -27,13 +27,13 @@ final class HttpParser implements BlueprintParserInterface
     public function __construct(
         private readonly ClientInterface $client,
         private readonly BlueprintColumnTypeInferrerInterface $inferrer = new BlueprintColumnTypeInferrer,
-        ?BlueprintParserInterface $parser = null,
+        ?DataReaderInterface $reader = null,
         private readonly string $sourceExtension = 'json',
         private readonly string $accept = 'application/json',
         private readonly array $headers = [],
         private readonly int $maxResponseBytes = 67108864,
     ) {
-        $this->parser = $parser;
+        $this->reader = $reader;
     }
 
     public function parse(string $source): BlueprintColumnCollectionInterface
@@ -78,7 +78,7 @@ final class HttpParser implements BlueprintParserInterface
         }
         $content = $this->readResponseBody($responseBody);
 
-        if ($this->parser === null) {
+        if ($this->reader === null) {
             $body = \json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
 
             return $this->inferrer->infer(\is_array($body) ? $this->extractRecords($body) ?? [] : []);
@@ -89,22 +89,22 @@ final class HttpParser implements BlueprintParserInterface
             throw new \RuntimeException('Unable to create a temporary file for the HTTP response.');
         }
 
-        $parserPath = $temporaryFile.'.'.$this->sourceExtension;
-        if (! \rename($temporaryFile, $parserPath)) {
+        $readerPath = $temporaryFile.'.'.$this->sourceExtension;
+        if (! \rename($temporaryFile, $readerPath)) {
             \unlink($temporaryFile);
 
             throw new \RuntimeException('Unable to prepare a temporary file for the HTTP response.');
         }
 
         try {
-            if (\file_put_contents($parserPath, $content) === false) {
+            if (\file_put_contents($readerPath, $content) === false) {
                 throw new \RuntimeException('Unable to write the HTTP response to a temporary file.');
             }
 
-            return $this->parser->parse($parserPath);
+            return $this->reader->read($readerPath);
         } finally {
-            if (\file_exists($parserPath)) {
-                \unlink($parserPath);
+            if (\file_exists($readerPath)) {
+                \unlink($readerPath);
             }
         }
     }

@@ -25,7 +25,7 @@ Parser implementations should remain thin and source-specific. Keep type detecti
 - `src/Blueprint/Interfaces/` defines parser, inferrer, and model contracts.
 - `src/Blueprint/Models/` contains the inferred schema and output configuration.
 
-All parsers follow the same pattern:
+All source parsers and readers follow the same pattern:
 
 1. Read rows from a source with Flow PHP ETL.
 2. Feed the rows into the Blueprint inferrer.

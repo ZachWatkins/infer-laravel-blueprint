@@ -22,7 +22,7 @@ parameters:
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
 			count: 1
-			path: src/Blueprint/Parsers/HttpParser.php
+			path: src/Blueprint/Readers/HttpReader.php
 
 		-
 			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'

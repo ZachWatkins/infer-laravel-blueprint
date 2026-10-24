@@ -9,12 +9,13 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Enums\BlueprintConfigResource;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\DataReaderInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Lexers\BlueprintFileLexer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintConfig;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Models\BlueprintModel;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpParser;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\HttpResponseSizeLimitException;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\HttpReader;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\HttpResponseSizeLimitException;
+use ZachWatkins\InferLaravelBlueprint\SQL\Interfaces\ParserInterface as SQLParserInterface;
 use ZachWatkins\InferLaravelBlueprint\Support\CaCertificateBundle;
 use ZachWatkins\InferLaravelBlueprint\Support\HttpUrl;
 
@@ -77,28 +78,28 @@ Options:
     /**
      * @var array<string, class-string>
      */
-    private array $parserClasses;
+    private array $readerClasses;
 
     private ?ClientInterface $httpClient;
 
     /**
      * @param  resource|null  $stdout
      * @param  resource|null  $stderr
-     * @param  array<string, class-string>|null  $parserClasses
+     * @param  array<string, class-string>|null  $readerClasses
      * @param  ClientInterface|null  $httpClient  Optional PSR-18 client for HTTP sources.
      */
-    public function __construct($stdout = null, $stderr = null, ?array $parserClasses = null, ?ClientInterface $httpClient = null)
+    public function __construct($stdout = null, $stderr = null, ?array $readerClasses = null, ?ClientInterface $httpClient = null)
     {
         $this->stdout = $stdout ?? \STDOUT;
         $this->stderr = $stderr ?? \STDERR;
         $this->httpClient = $httpClient;
-        $this->parserClasses = $parserClasses ?? [
-            'csv' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\CsvParser',
-            'json' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\JsonParser',
-            'xml' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\XmlParser',
-            'xlsx' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
-            'xls' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
-            'ods' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers\ExcelParser',
+        $this->readerClasses = $readerClasses ?? [
+            'csv' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\CsvReader',
+            'json' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\JsonReader',
+            'xml' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\XmlReader',
+            'xlsx' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\ExcelReader',
+            'xls' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\ExcelReader',
+            'ods' => '\ZachWatkins\InferLaravelBlueprint\Blueprint\Readers\ExcelReader',
         ];
 
         $runningPhar = \Phar::running(false);
@@ -283,22 +284,88 @@ Options:
         }
 
         $sourceExtension = $this->sourceExtension($source, $isHttpSource) ?? ($isHttpSource ? 'json' : null);
-        $parserClass = $sourceExtension === null ? null : ($this->parserClasses[$sourceExtension] ?? null);
+        $readerClass = $sourceExtension === null ? null : ($this->readerClasses[$sourceExtension] ?? null);
 
-        if ($parserClass === null) {
-            $this->writeUsage('Error: Unable to resolve parser class for the specified format and source.');
-
-            return 1;
-        }
-
-        if (! \class_exists($parserClass)) {
-            $this->writeError(\sprintf('Parser %s is not available.', $parserClass));
+        if ($readerClass === null) {
+            $this->writeUsage('Error: Unable to resolve reader class for the specified format and source.');
 
             return 1;
         }
 
-        if (! \is_a($parserClass, BlueprintParserInterface::class, true)) {
-            $this->writeError(\sprintf('Parser %s does not implement %s.', $parserClass, BlueprintParserInterface::class));
+        if (! \class_exists($readerClass)) {
+            $this->writeError(\sprintf('Reader %s is not available.', $readerClass));
+
+            return 1;
+        }
+
+        if (\is_a($readerClass, DataReaderInterface::class, true)) {
+            if (! is_string($blueprintOptions['model']) || $blueprintOptions['model'] === '') {
+                $this->writeError('Error: The --model option must be provided and must be a non-empty string.');
+
+                return 1;
+            }
+            if ($isHttpSource) {
+                $maxResponseBytes = $this->maxHttpResponseBytes();
+                $reader = new HttpReader(
+                    $this->httpClient ?? $this->createHttpClient($httpTimeout, $maxResponseBytes),
+                    reader: new $readerClass,
+                    sourceExtension: $sourceExtension,
+                    accept: $this->resolveHttpAccept($sourceExtension),
+                    headers: $httpHeaders,
+                    maxResponseBytes: $maxResponseBytes,
+                );
+            } else {
+                $reader = new $readerClass;
+            }
+
+            try {
+                $columns = $reader->read($source);
+            } catch (HttpResponseSizeLimitException|ClientExceptionInterface $exception) {
+                $this->writeError($exception->getMessage());
+
+                return 1;
+            }
+            $model = new BlueprintModel($blueprintOptions['model'], $columns);
+
+            if (! $dryRun) {
+                $lexer = new BlueprintFileLexer;
+                $blueprintContent = $lexer->toString(
+                    new BlueprintConfig(
+                        models: [$model],
+                        resources: $blueprintOptions['resources'],
+                        methods: $blueprintOptions['methods'],
+                        seeders: $blueprintOptions['seeders'],
+                        view: $blueprintOptions['view'],
+                    )
+                );
+                if (! $save) {
+                    $this->writeToStream(
+                        $this->stdout,
+                        $blueprintContent
+                    );
+                } else {
+                    $workingDirectory = $currentWorkingDirectory ?? getcwd();
+                    if ($workingDirectory === false) {
+                        $this->writeError('Error: Unable to resolve the output directory.');
+
+                        return 1;
+                    }
+                    $outputDirectory = realpath($workingDirectory);
+                    if ($outputDirectory === false) {
+                        $this->writeError('Error: Unable to resolve the output directory.');
+
+                        return 1;
+                    }
+                    $destinationPath = $outputDirectory.DIRECTORY_SEPARATOR.$model->tableNameSingular.'-blueprint.yaml';
+                    file_put_contents($destinationPath, $blueprintContent);
+                    $this->writeToStream(
+                        $this->stdout,
+                        sprintf('Blueprint file saved to %s', $destinationPath)
+                    );
+                }
+            }
+        } else {
+            $this->writeError(\sprintf('Class %s does not implement %s or %s.', $readerClass, SQLParserInterface::class, DataReaderInterface::class));
 
             return 1;
         }

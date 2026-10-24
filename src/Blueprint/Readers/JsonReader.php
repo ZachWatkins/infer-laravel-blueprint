@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Parsers;
+namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Readers;
 
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Inferrers\BlueprintColumnTypeInferrer;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnCollectionInterface;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnTypeInferrerInterface;
-use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintParserInterface;
+use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\DataReaderInterface;
 
-use function Flow\ETL\Adapter\CSV\from_csv;
+use function Flow\ETL\Adapter\JSON\from_json;
 use function Flow\ETL\DSL\data_frame;
 
-final class CsvParser implements BlueprintParserInterface
+final class JsonReader implements DataReaderInterface
 {
     public function __construct(
         private readonly BlueprintColumnTypeInferrerInterface $inferrer = new BlueprintColumnTypeInferrer,
     ) {}
 
-    public function parse(
-        string $source
+    public function read(
+        string $source,
     ): BlueprintColumnCollectionInterface {
         $rows = data_frame()
-            ->read(from_csv($source))
+            ->read(from_json($source))
             ->getEachAsArray();
 
         return $this->inferrer->infer($rows);

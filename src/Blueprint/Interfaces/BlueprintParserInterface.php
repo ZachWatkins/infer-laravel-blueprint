@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces;
 
 /**
- * Reads a data source and infers its SQL column schema.
+ * Reads a data source and infers its Laravel Blueprint columns.
  */
 interface BlueprintParserInterface
 {

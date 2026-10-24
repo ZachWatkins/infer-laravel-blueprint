@@ -14,9 +14,8 @@ use ZachWatkins\InferLaravelBlueprint\Parsers;
 use ZachWatkins\InferLaravelBlueprint\Support\ColumnStats;
 
 /**
- * Evaluates every value of every column in a stream of rows to infer the safest possible
- * SQL column type and modifiers (nullable, unique, unsigned, auto-incrementing) for a
- * given database engine.
+ * Evaluates every value of every column in a stream of rows to infer Laravel Blueprint
+ * column types and modifiers (nullable, unique, unsigned, auto-incrementing).
  *
  * This is the single shared inference contract used by every parser in
  * {@see Parsers} so that type-selection behavior is

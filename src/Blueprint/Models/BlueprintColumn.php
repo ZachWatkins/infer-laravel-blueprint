@@ -9,7 +9,7 @@ use ZachWatkins\InferLaravelBlueprint\Blueprint\Enums\LaravelColumnType;
 use ZachWatkins\InferLaravelBlueprint\Blueprint\Interfaces\BlueprintColumnInterface;
 
 /**
- * An immutable representation of a single inferred SQL column.
+ * An immutable representation of a single inferred Blueprint column.
  */
 final class BlueprintColumn implements BlueprintColumnInterface
 {

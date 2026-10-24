@@ -1,0 +1,33 @@
+models:
+  Model:
+    id: id
+    name: tinyText unique
+    active: boolean unique
+    birthdate: date unique
+
+controllers:
+  Model:
+    index:
+      query: all:models
+      render: model.index with:models
+    create:
+      render: model.create
+    store:
+      validate: id, name, active, birthdate
+      save: model
+      flash: model.id
+      redirect: models.index
+    show:
+      render: model.show with:model
+    edit:
+      render: model.edit with:model
+    update:
+      validate: id, name, active, birthdate
+      update: model
+      flash: model.id
+      redirect: models.index
+    destroy:
+      delete: model
+      redirect: models.index
+    customMethod:
+      # <action>: <parameters>

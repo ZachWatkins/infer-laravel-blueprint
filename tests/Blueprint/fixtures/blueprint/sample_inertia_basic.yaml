@@ -1,0 +1,33 @@
+models:
+  Model:
+    id: id
+    name: tinyText unique
+    active: boolean unique
+    birthdate: date unique
+
+controllers:
+  Model:
+    index:
+      query: all:models
+      inertia: Model/Index with:models
+    create:
+      inertia: Model/Create
+    store:
+      validate: id, name, active, birthdate
+      save: model
+      flash: model.id
+      redirect: models.index
+    show:
+      inertia: Model/Show with:model
+    edit:
+      inertia: Model/Edit with:model
+    update:
+      validate: id, name, active, birthdate
+      update: model
+      flash: model.id
+      redirect: models.index
+    destroy:
+      delete: model
+      redirect: models.index
+
+seeders: Model

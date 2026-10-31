@@ -111,6 +111,7 @@ If the user does not provide a value for an option, ask a short follow-up questi
 
 ## Decision Points
 
+- If the user specifies they want a web or api resource and does not specify individual controller methods, then do not ask for the controller methods and do not include that option in the CLI command.
 - If the user wants to use the result to run Laravel Shift Blueprint to scaffold the Laravel code, then run `php artisan blueprint:build <model-blueprint.yaml>` in their project directory, replacing `<model-blueprint.yaml>` with the actual file name of the generated Blueprint YAML file.
 - If the user only wants to preview the generated Blueprint YAML without saving it, run the command without the `--save` flag and do not execute `php artisan blueprint:build`.
 
